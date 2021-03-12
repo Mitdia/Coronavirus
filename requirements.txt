@@ -1,3 +1,2 @@
-python==3.9
 bokeh==2.3.0
 pandas==1.2.2
