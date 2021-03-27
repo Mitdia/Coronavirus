@@ -1,27 +1,34 @@
-# noinspection PyInterpreter
 import pandas as pd
 import map_data
+
 from bokeh.plotting import figure, output_file
 from bokeh.io import show, curdoc
-from math import pi
-from bokeh.models import CustomJS, Select, Panel, Tabs, Dropdown, Button
+from bokeh.embed import file_html
+from bokeh.models import CustomJS, Select, Dropdown, Button, Paragraph
+from bokeh.models.tools import *
 from bokeh.layouts import column, row
-from math import sqrt, log2
+from bokeh.settings import settings
+from math import sqrt, log2, pi
 
 
+settings.resources = "inline"
+settings.log_level = "debug"
 
-def parser_demo():
-    main_data = open("Data\\DecemberFinalForMap.merged_pangolin_lineages.WithAncNodes.csv", 'r')
-    mutations_data = open("Data\\RUSSIA.INTERESTING_VARIANTS.COUCCURRENCE.JAN.txt", 'r')
-    parsed_data = pd.read_csv(main_data, sep=';', header=0)
-    data_about_mutations = pd.read_csv(mutations_data, sep='\t', header=0)
-    parsed_data.set_index("GISAID_name")
-    data_about_mutations.set_index("GISAID_name")
-    parsed_data = parsed_data.merge(data_about_mutations, how='left')
-    parsed_data.where(pd.notnull(parsed_data), 0)
-    main_data.close()
-    mutations_data.close()
-    return parsed_data
+def parser():
+    global data, regions, mutations_names, information_about_mutations
+    file_for_data = open("Data/data.csv", 'r')
+    file_for_regions = open("Data/regions.txt", 'r')
+    file_for_mutations_names = open("Data/mutations_names.txt", 'r')
+    file_for_information_about_mutations = open("Data/information_about_mutations.txt", 'r')
+    data = pd.read_csv(file_for_data, header=0)
+    regions = file_for_regions.read().split(',')
+    mutations_names = file_for_mutations_names.read().split(',')
+    information_about_mutations_raw = file_for_information_about_mutations.read().split('\n')
+    information_about_mutations = {}
+    for mutation_index in range(0, len(information_about_mutations_raw) - 1, 2):
+        mutation_name = information_about_mutations_raw[mutation_index]
+        information_about_mutation = information_about_mutations_raw[mutation_index + 1]
+        information_about_mutations[mutation_name] = information_about_mutation
 
 
 def get_mutations_names():
@@ -33,11 +40,31 @@ def get_mutations_names():
     return parsed_mutation_names
 
 
-def create_main_map():
+def configure_plot():
     global plt_width, plt_height
-    p = figure(plot_width=plt_width, plot_height=plt_height, tooltips="$name", tools="pan,wheel_zoom,reset")
-    p.image_url(url=[' http://localhost:5006/Server/static/map.svg'], x=0, y=0, w=plt_width, h=plt_height,
-                anchor="bottom_left")
+    zoom = WheelZoomTool(zoom_on_axis=False)
+    reset = ResetTool()
+    hover = HoverTool()
+    pan = PanTool()
+    TOOLTIPS = """
+        <div>
+            <span style="font-size: 20px; ">$name</span>
+        </div>
+    """
+    tools = [zoom, reset, hover, pan]
+    p = figure(plot_width=plt_width, plot_height=plt_height, tooltips=TOOLTIPS,
+    tools=tools, toolbar_location="right", margin=[0, 100, 0, 100])
+    p.grid.visible = False
+    p.axis.visible = False
+    p.outline_line_color = "green"
+    p.match_aspect = True
+    p.toolbar.active_scroll = zoom
+    p.image_url(url=['https://ma.fbb.msu.ru/coronamap/static/map.svg'], x=0, y=0,
+    w=plt_width, h=plt_height, anchor="bottom_left")
+    return p
+
+def create_main_map():
+    p = configure_plot()
     for region in regions:
         coordinates_of_region = map_data.coordinates[region]
         number_of_samples = (data.location == region).sum()
@@ -49,9 +76,7 @@ def create_main_map():
 
 
 def create_map(mutation_name, data):
-    global plt_width, plt_height
-    p = figure(plot_width=plt_width, plot_height=plt_height, tooltips="$name", tools="pan,wheel_zoom,reset")
-    p.image_url(url=[' http://localhost:5006/Server/static/map.svg'], x=0, y=0, w=plt_width, h=plt_height, anchor="bottom_left")
+    p = configure_plot()
     for region in regions:
         coordinates_of_region = map_data.coordinates[region]
         region_data = data.loc[data['location'] == region]
@@ -86,36 +111,47 @@ def create_map(mutation_name, data):
     return p
 
 
+def render_text(mutation_name):
+    global information_about_mutations, plt_width, plt_height
+    information_about_mutation = information_about_mutations[mutation_name]
+    text = Paragraph(text=information_about_mutation, width=(plt_width//2), height=plt_height,  margin=[0, 100, 0, 100])
+    return text
+
+
 def update_plot(attrname, old, new):
-    global last_module, data
+    global last_module, data, doc
     mutation = select.value
-    curdoc().remove_root(last_module)
-    last_module = row(create_map(mutation, data))
-    curdoc().add_root(last_module)
+    doc.remove_root(last_module)
+    if mutation in information_about_mutations:
+        text = render_text(mutation)
+        map = create_map(mutation, data)
+        last_module = column(map, text, sizing_mode="scale_width")
+    else:
+        map = create_map(mutation, data)
+        last_module = column(map, sizing_mode="scale_width")
+    doc.add_root(last_module)
 
 
 def show_main_map():
-    global last_module, data
-    curdoc().remove_root(last_module)
-    last_module = row(create_main_map())
-    curdoc().add_root(last_module)
+    global last_module, data, doc
+    doc.remove_root(last_module)
+    last_module = column(create_main_map(), sizing_mode="scale_width")
+    doc.add_root(last_module)
 
 
 plt_width = 1500
 plt_height = 866
-file_for_data = open("Data\\data.csv", 'r')
-file_for_regions = open("Data\\regions.txt", 'r')
-file_for_mutations_names = open("Data\\mutations_names.txt", 'r')
-data = pd.read_csv(file_for_data, header=0)
-regions = file_for_regions.read().split(',')
-mutations_names = file_for_mutations_names.read().split(',')
-select = Select(title="Мутация", value=mutations_names[0], options=mutations_names)
-button = Button(label="Количество образцов по регионам", button_type="success")
+parser()
+
+select = Select(min_height=50, title="Mutation", value=mutations_names[0], options=mutations_names, margin=[0, 0, 0, 100])
+button = Button(min_height=50, label="Number of samples per regions", button_type="success", margin=[0, 0, 0, 100])
 select.on_change('value', update_plot)
 button.on_click(show_main_map)
 controls = column(button, select)
-last_module = row(create_main_map())
-curdoc().title = 'Coronavirus'
-curdoc().add_root(controls)
-curdoc().add_root(last_module)
+last_module = column(create_main_map(), sizing_mode="scale_width")
+doc = curdoc()
 
+
+doc.title = 'Coronavirus'
+doc.add_root(controls)
+doc.add_root(last_module)
