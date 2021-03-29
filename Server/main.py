@@ -1,6 +1,7 @@
 from math import log2, pi, sqrt
 from pathlib import Path
 
+from functools import partial
 import pandas as pd
 from bokeh.embed import file_html
 from bokeh.io import curdoc, show
@@ -170,8 +171,8 @@ def render_text(mutation_name):
     return text
 
 
-def update_plot(attrname, old, new):
-    global last_module, data, doc
+def update_plot(attrname, old, new, doc):
+    global last_module, data
     mutation = select.value
     doc.remove_root(last_module)
     if mutation in information_about_mutations:
@@ -184,14 +185,15 @@ def update_plot(attrname, old, new):
     doc.add_root(last_module)
 
 
-def show_main_map():
-    global last_module, data, doc
+def show_main_map(doc):
+    global last_module, data
     doc.remove_root(last_module)
     last_module = column(create_main_map(), sizing_mode="scale_width")
     doc.add_root(last_module)
 
 
 def run(doc):
+    global last_module, select, button
     select = Select(
         min_height=50,
         title="Mutation",
@@ -205,12 +207,10 @@ def run(doc):
         button_type="success",
         margin=[0, 0, 0, 100],
     )
-    select.on_change("value", update_plot)
-    button.on_click(show_main_map)
+    select.on_change("value", partial(update_plot, doc=doc))
+    button.on_click(partial(show_main_map, doc=doc))
     controls = column(button, select)
     last_module = column(create_main_map(), sizing_mode="scale_width")
-    doc = curdoc()
-
     doc.title = "Coronavirus"
     doc.add_root(controls)
     doc.add_root(last_module)
@@ -236,8 +236,8 @@ if __name__ == "__main__":
         "prefix": "/bokeh",
         "allow_websocket_origin": ["*"],
     }
-    server = Server(test, **kws)
-    # server = Server(run, **kws)
+    #server = Server(test, **kws)
+    server = Server(run, **kws)
     server.start()
     if __name__ == "__main__":
         server.io_loop.add_callback(server.show, "/")
