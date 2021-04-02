@@ -7,7 +7,7 @@ from bokeh.models import Paragraph
 from bokeh.resources import CDN
 from database import Database
 from flask import Flask, request
-from helpers.plot import create_main_map, create_map
+from helpers.plot import create_main_map, create_map, render_text
 from jinja2 import Environment, PackageLoader, Template
 from loguru import logger
 from settings import SERVER_ADDRESS, SERVER_PORT
