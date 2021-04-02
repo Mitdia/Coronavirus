@@ -46,11 +46,22 @@ def configure_plot():
     return p
 
 
+def render_text(db, name):
+    information_about_mutation = db.mutation_info(name)
+    text = Paragraph(
+        text=information_about_mutation,
+        width=(PLT_WIDTH // 2),
+        height=PLT_HEIGHT,
+        margin=[0, 100, 0, 100],
+    )
+    return text
+
+
 def create_main_map(db):
     p = configure_plot()
     for region in db.regions:
         coordinates_of_region = coordinates[region]
-        number_of_samples = db.data_by_region_sum(region)
+        number_of_samples = db.number_of_samples(region)
         radius = log2(number_of_samples + 1) * 5
         p.circle(
             x=coordinates_of_region[0],
@@ -60,16 +71,15 @@ def create_main_map(db):
             fill_color="blue",
             name=f"{region}: {number_of_samples}",
         )
-    return p
+        layout = column(p, sizing_mode="scale_width")
+    return layout
 
 
-def create_map(db, mutation_name, data):
+def create_map(db, mutation_name):
     p = configure_plot()
     for region in db.regions:
         coordinates_of_region = coordinates[region]
-        region_data = db.data_by_region(region)
-
-        all_variants = len(region_data)
+        all_variants = db.number_of_samples(region)
         if all_variants == 0:
             p.circle(
                 x=coordinates_of_region[0],
@@ -80,7 +90,7 @@ def create_map(db, mutation_name, data):
                 name=f"{region}: данные отсутсвуют",
             )
             continue
-        mutated_variants = region_data[mutation_name].sum()
+        mutated_variants = db.number_of_mutatated_variants(mutation_name, region)
         nonmutated_variants = all_variants - mutated_variants
         if nonmutated_variants == 0:
             p.circle(
@@ -128,18 +138,12 @@ def create_map(db, mutation_name, data):
                 name=first_name,
                 alpha=0.8,
             )
-    return p
-
-
-def render_text(db, mutation_name):
-    information_about_mutation = db.mutation_info(name)
-    text = Paragraph(
-        text=information_about_mutation,
-        width=(PLT_WIDTH // 2),
-        height=PLT_HEIGHT,
-        margin=[0, 100, 0, 100],
-    )
-    return text
+            if mutation_name in db.mutation_with_info_names:
+                text = render_text(db, mutation_name)
+                layout = column(p, text, sizing_mode="scale_width")
+            else:
+                layout = column(p, sizing_mode="scale_width")
+    return layout
 
 
 def update_plot(db, attrname, old, new, doc):

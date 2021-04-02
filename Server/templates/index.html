@@ -19,7 +19,7 @@
         {{ bokeh_js | indent(8) if bokeh_js }}
         {% endblock %}
     {% endblock %}
-    
+
     {% block postamble %}{% endblock %}
     {% endblock %}
 </head>
@@ -29,12 +29,12 @@
 
     <div>
         TEST<br>
-        fuck yeah it's work 
+        fuck yeah it's work
     </div>
 
     <div id="coronaplot"></div>
     <script>
-    fetch('/plot')
+    fetch('/plot?mutation={{mutation}}')
         .then(function(response) { return response.json(); })
         .then(function(item) { return Bokeh.embed.embed_item(item, "coronaplot"); })
     </script>

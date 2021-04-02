@@ -3,10 +3,11 @@ from functools import lru_cache
 
 from bokeh.embed import file_html, json_item
 from bokeh.plotting import figure
+from bokeh.models import Paragraph
 from bokeh.resources import CDN
 from database import Database
-from flask import Flask
-from helpers.plot import create_main_map
+from flask import Flask, request
+from helpers.plot import create_main_map, create_map
 from jinja2 import Environment, PackageLoader, Template
 from loguru import logger
 from settings import SERVER_ADDRESS, SERVER_PORT
@@ -24,21 +25,25 @@ logger.add(
 
 
 @app.route("/plot")
-@lru_cache()
 def plot():
-    p = create_main_map(db)
+    mutation = request.args.get("mutation", default = "all", type=str)
+    if mutation == "all":
+        p = create_main_map(db)
+    elif mutation in db.mutation_names:
+        p = create_map(db, mutation)
     return json_item(p, "coronaplot")
 
 
 @app.route("/")
-@lru_cache()
 def root():
+    mutation = request.args.get("mutation", default = "all", type=str)
     return file_html(
         # [controls, last_module],
-        [figure()],  # TODO: remove me CDN only
+        [figure(), Paragraph()],  # TODO: remove me CDN only
         CDN,
         "Coronavirus",
         template=jinja_env.get_template("index.html"),
+        template_variables={"mutation": mutation}
     )
 
 
