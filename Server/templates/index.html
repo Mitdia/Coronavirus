@@ -38,6 +38,12 @@
         .then(function(response) { return response.json(); })
         .then(function(item) { return Bokeh.embed.embed_item(item, "coronaplot"); })
     </script>
+    <div id="coronatext"></div>
+    <script>
+    fetch('/text?mutation={{mutation}}')
+        .then(function(response) { return response.json(); })
+        .then(function(item) { return Bokeh.embed.embed_item(item, "coronaplot"); })
+    </script>
 </body>
 {% endblock %}
 </html>

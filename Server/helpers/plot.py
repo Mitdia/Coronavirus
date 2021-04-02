@@ -71,7 +71,7 @@ def create_main_map(db):
             fill_color="blue",
             name=f"{region}: {number_of_samples}",
         )
-        layout = column(p, sizing_mode="scale_width")
+    layout = column(p, sizing_mode="scale_width")
     return layout
 
 
@@ -138,11 +138,8 @@ def create_map(db, mutation_name):
                 name=first_name,
                 alpha=0.8,
             )
-            if mutation_name in db.mutation_with_info_names:
-                text = render_text(db, mutation_name)
-                layout = column(p, text, sizing_mode="scale_width")
-            else:
-                layout = column(p, sizing_mode="scale_width")
+
+    layout = column(p, sizing_mode="scale_width")
     return layout
 
 

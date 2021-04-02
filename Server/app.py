@@ -26,17 +26,26 @@ logger.add(
 
 @app.route("/plot")
 def plot():
-    mutation = request.args.get("mutation", default = "all", type=str)
-    if mutation == "all":
+    mutation = request.args.get("mutation", default = "ALL", type=str)
+    if mutation == "ALL":
         p = create_main_map(db)
     elif mutation in db.mutation_names:
         p = create_map(db, mutation)
     return json_item(p, "coronaplot")
 
 
+@app.route("/text")
+def plot():
+    mutation = request.args.get("mutation", default = "ALL", type=str)
+    if mutation not in db.mutation_with_info_names:
+        mutation = "NOINFO"
+    p = render_text(db, mutation)
+    return json_item(p, "coronatext")
+
+
 @app.route("/")
 def root():
-    mutation = request.args.get("mutation", default = "all", type=str)
+    mutation = request.args.get("mutation", default = "ALL", type=str)
     return file_html(
         # [controls, last_module],
         [figure(), Paragraph()],  # TODO: remove me CDN only
