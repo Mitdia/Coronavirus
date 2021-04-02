@@ -35,7 +35,7 @@ def plot():
 
 
 @app.route("/text")
-def plot():
+def text():
     mutation = request.args.get("mutation", default = "ALL", type=str)
     if mutation not in db.mutation_with_info_names:
         mutation = "NOINFO"
