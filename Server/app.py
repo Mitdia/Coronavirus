@@ -1,13 +1,14 @@
 import sys
 from functools import lru_cache
+from pathlib import Path
 
 from bokeh.embed import file_html, json_item
 from bokeh.plotting import figure
-from bokeh.models import Paragraph
+from bokeh.models import Paragraph, Select, Button
 from bokeh.resources import CDN
 from database import Database
-from flask import Flask, request
-from helpers.plot import create_main_map, create_map, render_text
+from flask import Flask, request, Markup, send_from_directory
+from helpers.plot import create_main_map, create_map, render_text, create_controls
 from jinja2 import Environment, PackageLoader, Template
 from loguru import logger
 from settings import SERVER_ADDRESS, SERVER_PORT
@@ -29,7 +30,7 @@ def plot():
     mutation = request.args.get("mutation", default = "ALL", type=str)
     if mutation == "ALL":
         p = create_main_map(db)
-    elif mutation in db.mutation_names:
+    elif mutation in db.mutations_names:
         p = create_map(db, mutation)
     return json_item(p, "coronaplot")
 
@@ -43,16 +44,25 @@ def text():
     return json_item(p, "coronatext")
 
 
+@app.route("/controls")
+@lru_cache()
+def controls():
+    p = create_controls(db)
+    return json_item(p, "coronacontrols")
+
+
+
 @app.route("/")
 def root():
     mutation = request.args.get("mutation", default = "ALL", type=str)
+    mutation_info = db.mutation_info(mutation)
     return file_html(
         # [controls, last_module],
-        [figure(), Paragraph()],  # TODO: remove me CDN only
+        [figure(), Paragraph(), Select(), Button()],  # TODO: remove me CDN only
         CDN,
         "Coronavirus",
         template=jinja_env.get_template("index.html"),
-        template_variables={"mutation": mutation}
+        template_variables={"mutation": mutation, "mutation_info": mutation_info}
     )
 
 

@@ -8,6 +8,18 @@
     {% block inner_head %}
     <meta charset="utf-8">
     <title>{% block title %}{{ title | e if title else "Bokeh Plot" }}{% endblock %}</title>
+
+    {% block plugin_stylesheets %}
+    <link rel="stylesheet" href="static/assets/tether/tether.min.css">
+    <link rel="stylesheet" href="static/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/assets/bootstrap/css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="static/assets/bootstrap/css/bootstrap-reboot.min.css">
+    <link rel="stylesheet" href="static/assets/theme/css/style.css">
+    <link rel="preload" as="style" href="static/assets/mobirise/css/mbr-additional.css"><link rel="stylesheet" href="static/assets/mobirise/css/mbr-additional.css" type="text/css">
+    {% endblock plugin_stylesheets %}
+
+    {% block stylesheets %}{% endblock stylesheets %}
+
     {% block preamble %}{% endblock %}
 
     {% block resources %}
@@ -27,23 +39,39 @@
 {% block body %}
 <body>
 
-    <div>
-        TEST<br>
-        fuck yeah it's work
-    </div>
+    <section>
+      <div id="coronacontrols" class="row justify-content-end">
+        <script>
+        fetch('/controls')
+            .then(function(response) { return response.json(); })
+            .then(function(item) { return Bokeh.embed.embed_item(item, "coronacontrols"); })
+        </script>
+      </div>
+  </section>
 
-    <div id="coronaplot"></div>
-    <script>
-    fetch('/plot?mutation={{mutation}}')
-        .then(function(response) { return response.json(); })
-        .then(function(item) { return Bokeh.embed.embed_item(item, "coronaplot"); })
-    </script>
-    <div id="coronatext"></div>
-    <script>
-    fetch('/text?mutation={{mutation}}')
-        .then(function(response) { return response.json(); })
-        .then(function(item) { return Bokeh.embed.embed_item(item, "coronaplot"); })
-    </script>
+  <section class="image1 cid-suyHhN56z8" id="image1-7">
+    <div>
+        <div class="row align-items-center">
+            <div class="col-12 col-lg-8">
+                <div class="image-wrapper">
+                  <div id="coronaplot">
+                    <script>
+                    fetch('/plot?mutation={{mutation}}')
+                        .then(function(response) { return response.json(); })
+                        .then(function(item) { return Bokeh.embed.embed_item(item, "coronaplot"); })
+                    </script>
+                  </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-4">
+                <div class="text-wrapper">
+                    <h3 class="mbr-section-title mbr-fonts-style mb-3 display-5">
+                        <strong>{{mutation}}</strong></h3>
+                          <p class="mbr-text mbr-fonts-style display-7">{{mutation_info}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 {% endblock %}
 </html>

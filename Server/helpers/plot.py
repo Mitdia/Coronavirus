@@ -1,7 +1,7 @@
 from math import log2, pi
 
-from bokeh.layouts import column
-from bokeh.models import Paragraph, Select
+from bokeh.layouts import column, row
+from bokeh.models import Paragraph, Select, Button, CustomJS
 from bokeh.models.tools import HoverTool, PanTool, ResetTool, WheelZoomTool
 from bokeh.plotting import figure
 from settings import PLT_HEIGHT, PLT_WIDTH
@@ -26,8 +26,8 @@ def configure_plot():
         tooltips=TOOLTIPS,
         tools=tools,
         toolbar_location="right",
-        margin=[0, 100, 0, 100],
         sizing_mode="scale_width",
+        margin=[0, 0, 0, 90]
     )
     p.grid.visible = False
     p.axis.visible = False
@@ -36,7 +36,7 @@ def configure_plot():
     p.toolbar.active_scroll = zoom
 
     p.image_url(
-        url=["https://ma.fbb.msu.ru/coronamap/static/map.svg"],
+        url=["/static/img/map.svg"],
         x=0,
         y=0,
         w=PLT_WIDTH,
@@ -54,7 +54,8 @@ def render_text(db, name):
         height=PLT_HEIGHT,
         margin=[0, 100, 0, 100],
     )
-    return text
+    layout = column(text, sizing_mode="scale_width")
+    return layout
 
 
 def create_main_map(db):
@@ -87,7 +88,7 @@ def create_map(db, mutation_name):
                 radius=10,
                 alpha=0.1,
                 fill_color="blue",
-                name=f"{region}: данные отсутсвуют",
+                name=f"{region}: no data",
             )
             continue
         mutated_variants = db.number_of_mutatated_variants(mutation_name, region)
@@ -143,11 +144,36 @@ def create_map(db, mutation_name):
     return layout
 
 
+def create_controls(db):
+    mutations_names = db.mutations_names
+    select = Select(
+        min_height=50,
+        title="Mutation",
+        value=mutations_names[0],
+        options=mutations_names,
+        margin=[0, 100, 0, 100]
+    )
+    button = Button(
+        min_height=50,
+        label="Number of samples per regions",
+        button_type="success",
+        margin=[50, 100, 0, 100]
+    )
+    text = Paragraph(
+        text="Welcome to coronomap website! You can choose mutation and see how many samples are presented in each region of Russion Federation or you can see how many samples were recieved in each region",
+        margin=[50, 100, 0, 100],
+    )
+    select.js_on_change("value", CustomJS(code=f"window.location.href=('http://localhost:5006/?mutation=' + this.value)"))
+    button.js_on_click(CustomJS(code=f"window.location.href=('http://localhost:5006/?mutation=ALL')"))
+    controls = row(column(button, select), text, sizing_mode="scale_width")
+    return controls
+
+
 def update_plot(db, attrname, old, new, doc):
     global last_module, data
     mutation = select.value
     doc.remove_root(last_module)
-    if mutation in db.mutation_names:
+    if mutation in db.mutations_names:
         text = render_text(mutation)
         map = create_map(mutation, data)
         last_module = column(map, text, sizing_mode="scale_width")

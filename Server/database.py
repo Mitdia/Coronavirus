@@ -88,7 +88,7 @@ class Database(object):
 
     @property
     @lru_cache()
-    def mutation_names(self):
+    def mutations_names(self):
         mutations_names = (
             open(Path("Data", "mutations_names.txt"), "r").read().split(",")
         )
@@ -112,6 +112,8 @@ class Database(object):
         return information_about_mutations
 
     def mutation_info(self, mutation):
+        if mutation not in self.mutation_with_info_names:
+            mutation = "NOINFO"
         return self._information_about_mutations[mutation]
 
     @property
