@@ -1,6 +1,7 @@
 from pathlib import Path
 import sqlite3
 import pandas as pd
+from map_data import coordinates
 
 
 def translate_regions_names(region_name):
@@ -11,7 +12,7 @@ def translate_regions_names(region_name):
             return regions_names[0]
 
 
-def parse_data(adress=Path("Data", "RussianSamples.Mutations.UpTo28thFeb.txt")):
+def parse_data(regions, adress=Path("Data", "RussianSamples.Mutations.UpTo28thFeb.txt")):
     main_data = open(adress, "r", encoding="utf-8")
     data = pd.read_csv(main_data, sep="\t", header=None)
 
@@ -22,8 +23,12 @@ def parse_data(adress=Path("Data", "RussianSamples.Mutations.UpTo28thFeb.txt")):
                 mutations_names.append(mutation_name)
     mutations_names.sort()
     data = data.rename(
-        columns={0: "sample name", 1: "date", 2: "location", 3: "mutations"}
+        columns={0: "sample name", 1: "date", 2: "Location_EN", 3: "mutations"}
     )
+    data["Location_RU"] = data["Location_EN"]
+    for region in regions:
+        data["Location_RU"] = data["Location_RU"].replace([region], translate_regions_names(region))
+
     data["date"] = pd.to_datetime(data["date"], errors="coerce")
     mutation_data = pd.DataFrame(
         {}, columns=["Mutation", "Location_RU", "Location_EN", "Date", "Sample_ID"]
@@ -31,7 +36,7 @@ def parse_data(adress=Path("Data", "RussianSamples.Mutations.UpTo28thFeb.txt")):
     pandas_index = 0
 
     for index, row in data.iterrows():
-        location = row["location"]
+        location = row["Location_EN"]
         date = row["date"]
         for mutation in row["mutations"].split(",")[:-1]:
             if mutation != " ":
@@ -74,6 +79,26 @@ def parse_regions(adress=Path("Data", "RegionsInGADM.txt")):
         else:
             region_index += 1
 
+    dbase = sqlite3.connect("samples_data.db")
+    dbase.execute("""DROP TABLE IF EXISTS 'regions';""")
+    dbase.execute("""CREATE TABLE regions (
+	                 RU_names TEXT UNIQE,
+	                 EN_names TEXT UNIQE,
+                     X_coordinate INTEGER,
+                     Y_coordinate INTEGER
+	                 );""")
+
+    for region in regions_dictionary:
+        if region[0] not in blocked:
+            x = coordinates[region[0]][0]
+            y = coordinates[region[0]][1]
+            dbase.execute(f"""INSERT INTO regions
+                            (RU_names, EN_names, X_coordinate, Y_coordinate)
+                            VALUES
+                        	(\"{region[1]}\", \"{region[0]}\", {x}, {y});
+                                """)
+    dbase.commit()
+    dbase.close()
     return regions, regions_dictionary
 
 
@@ -86,7 +111,7 @@ blocked = [
     "Sevastopol'",
 ]
 regions, regions_dictionary = parse_regions()
-mutations_names = parse_data()
+mutations_names = parse_data(regions)
 file_for_regions = open(Path("Data", "regions.txt"), "w", encoding="utf-8")
 file_for_mutations_names = open(
     Path("Data", "mutations_names.txt"), "w", encoding="utf-8"

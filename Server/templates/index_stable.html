@@ -28,21 +28,21 @@
 <body>
   <div id="coronacontrols">
     <script>
-    fetch('/controls')
+    fetch('/controls?lang={{lang}}')
         .then(function(response) { return response.json(); })
         .then(function(item) { return Bokeh.embed.embed_item(item, "coronacontrols"); })
     </script>
   </div>
   <div id="coronaplot">
     <script>
-    fetch('/plot?mutation={{mutation}}')
+    fetch('/plot?mutation={{mutation}}&lang={{lang}}')
         .then(function(response) { return response.json(); })
         .then(function(item) { return Bokeh.embed.embed_item(item, "coronaplot"); })
     </script>
   </div>
   <div id="coronatext">
     <script>
-    fetch('/text?mutation={{mutation}}')
+    fetch('/text?mutation={{mutation}}&lang={{lang}}')
         .then(function(response) { return response.json(); })
         .then(function(item) { return Bokeh.embed.embed_item(item, "coronatext"); })
     </script>

@@ -1,12 +1,11 @@
 from math import log2, pi
 
+from functools import lru_cache
 from bokeh.layouts import column, row
 from bokeh.models import Paragraph, Select, Button, CustomJS
 from bokeh.models.tools import HoverTool, PanTool, ResetTool, WheelZoomTool
 from bokeh.plotting import figure
 from settings import PLT_HEIGHT, PLT_WIDTH
-
-from .map_data import coordinates
 
 
 def configure_plot():
@@ -58,10 +57,10 @@ def render_text(db, name):
     return layout
 
 
-def create_main_map(db):
+def create_main_map(db, lang):
     p = configure_plot()
-    for region in db.regions:
-        coordinates_of_region = coordinates[region]
+    for region in db.regions(lang):
+        coordinates_of_region = db.coordinate(region)
         number_of_samples = db.number_of_samples(region)
         radius = log2(number_of_samples + 1) * 5
         p.circle(
@@ -76,10 +75,14 @@ def create_main_map(db):
     return layout
 
 
-def create_map(db, mutation_name):
+def create_map(db, mutation_name, lang):
     p = configure_plot()
-    for region in db.regions:
-        coordinates_of_region = coordinates[region]
+    if lang == "RU":
+        no_data_text = "данные отсутсвуют"
+    else:
+        no_data_text = "no data"
+    for region in db.regions(lang):
+        coordinates_of_region = db.coordinate(region)
         all_variants = db.number_of_samples(region)
         if all_variants == 0:
             p.circle(
@@ -88,7 +91,7 @@ def create_map(db, mutation_name):
                 radius=10,
                 alpha=0.1,
                 fill_color="blue",
-                name=f"{region}: no data",
+                name=f"{region}: {no_data_text}",
             )
             continue
         mutated_variants = db.number_of_mutatated_variants(mutation_name, region)
@@ -144,47 +147,45 @@ def create_map(db, mutation_name):
     return layout
 
 
-def create_controls(db):
+def create_controls(db, lang, address="http://localhost:5006"):
+    if lang == "RU":
+        titles = ["Мутация", "Число образцов по регионам"]
+        welcome_text = "Приветствуем на сайте coronomap! Вы можете выбрать мутацию и посмотреть как много образцов в каждом регионе или же вы можете посмотреть сколько образцов было получено в каждом регионе"
+        lang_sw = "EN"
+    else:
+        titles = ["Mutation", "Number of samples per region"]
+        welcome_text = "Welcome to coronomap website! You can choose mutation and see how many samples are presented in each region of Russion Federation or you can see how many samples were recieved in each region"
+        lang_sw = "RU"
     mutations_names = db.mutations_names
     select = Select(
         min_height=50,
-        title="Mutation",
+        title=titles[0],
         value=mutations_names[0],
         options=mutations_names,
         margin=[0, 100, 0, 100]
     )
     button = Button(
         min_height=50,
-        label="Number of samples per regions",
+        label=titles[1],
         button_type="success",
-        margin=[50, 100, 0, 100]
+        margin=[50, 25, 0, 100]
     )
     text = Paragraph(
-        text="Welcome to coronomap website! You can choose mutation and see how many samples are presented in each region of Russion Federation or you can see how many samples were recieved in each region",
+        text=welcome_text,
+        css_classes = ["welcome_text"],
         margin=[50, 100, 0, 100],
     )
-    select.js_on_change("value", CustomJS(code=f"window.location.href=('http://localhost:5006/?mutation=' + this.value)"))
-    button.js_on_click(CustomJS(code=f"window.location.href=('http://localhost:5006/?mutation=ALL')"))
-    controls = row(column(button, select), text, sizing_mode="scale_width")
+    lang_switch = Button(
+        min_height=50,
+        label=lang,
+        button_type="success",
+        margin=[50, 100, 0, 25]
+    )
+    select.js_on_change("value", CustomJS(code=f"window.location.href=('{address}/?mutation=' + this.value + '&lang={lang}')"))
+    button.js_on_click(CustomJS(code=f"window.location.href=('{address}/?mutation=ALL&lang={lang}')"))
+    lang_switch.js_on_click(CustomJS(code=f"""var url_string = window.location.href;
+                                              var url = new URL(url_string);
+                                              var mutation = url.searchParams.get("mutation");
+                                              window.location.href=(`{address}/?mutation=${{mutation}}&lang={lang_sw}`)"""))
+    controls = row(column(row(button, lang_switch), select), text, sizing_mode="scale_width")
     return controls
-
-
-def update_plot(db, attrname, old, new, doc):
-    global last_module, data
-    mutation = select.value
-    doc.remove_root(last_module)
-    if mutation in db.mutations_names:
-        text = render_text(mutation)
-        map = create_map(mutation, data)
-        last_module = column(map, text, sizing_mode="scale_width")
-    else:
-        map = create_map(mutation, data)
-        last_module = column(map, sizing_mode="scale_width")
-    doc.add_root(last_module)
-
-
-def show_main_map(doc):
-    global last_module, data
-    doc.remove_root(last_module)
-    last_module = column(create_main_map(), sizing_mode="scale_width")
-    doc.add_root(last_module)

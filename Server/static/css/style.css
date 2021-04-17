@@ -1,21 +1,5 @@
-/* static/style.css */
-
-h1 {
-    color: navajowhite;
-    font-variant-caps: all-small-caps;
-    font-size: 46px;
-}
-
-h3 {
-  color: white;
-  font-size: 36px;
-}
-
-li {
-  color: red;
-  font-size: 50px;
-}
-
-body {
-    background: firebrick;
+.welcome_text {
+  color: firebrick;
+  font-size: 1.2rem;
+  font-family: 'Jost', sans-serif;
 }

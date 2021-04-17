@@ -28,10 +28,11 @@ logger.add(
 @app.route("/plot")
 def plot():
     mutation = request.args.get("mutation", default = "ALL", type=str)
+    language = request.args.get("lang", default = "EN", type=str)
     if mutation == "ALL":
-        p = create_main_map(db)
+        p = create_main_map(db, language)
     elif mutation in db.mutations_names:
-        p = create_map(db, mutation)
+        p = create_map(db, mutation, language)
     return json_item(p, "coronaplot")
 
 
@@ -45,16 +46,21 @@ def text():
 
 
 @app.route("/controls")
-@lru_cache()
 def controls():
-    p = create_controls(db)
+    language = request.args.get("lang", default = "EN", type=str)
+    p = create_controls(db, language)
     return json_item(p, "coronacontrols")
 
 
 
 @app.route("/")
 def root():
-    mutation = request.args.get("mutation", default = "ALL", type=str)
+    mutation = request.args.get("mutation", default = "", type=str)
+    language = request.args.get("lang", default = "EN", type=str)
+    if mutation not in db.mutations_names:
+        mutation = "ALL"
+    if language != "RU":
+        language = "EN"
     mutation_info = db.mutation_info(mutation)
     return file_html(
         # [controls, last_module],
@@ -62,7 +68,9 @@ def root():
         CDN,
         "Coronavirus",
         template=jinja_env.get_template("index.html"),
-        template_variables={"mutation": mutation, "mutation_info": mutation_info}
+        template_variables={"mutation": mutation,
+                            "mutation_info": mutation_info,
+                            "lang": language}
     )
 
 

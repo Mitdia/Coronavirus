@@ -9,22 +9,19 @@
     <meta charset="utf-8">
     <title>{% block title %}{{ title | e if title else "Bokeh Plot" }}{% endblock %}</title>
 
-    {% block plugin_stylesheets %}
-    <link rel="stylesheet" href="static/assets/tether/tether.min.css">
-    <link rel="stylesheet" href="static/assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="static/assets/bootstrap/css/bootstrap-grid.min.css">
-    <link rel="stylesheet" href="static/assets/bootstrap/css/bootstrap-reboot.min.css">
-    <link rel="stylesheet" href="static/assets/theme/css/style.css">
-    <link rel="preload" as="style" href="static/assets/mobirise/css/mbr-additional.css"><link rel="stylesheet" href="static/assets/mobirise/css/mbr-additional.css" type="text/css">
-    {% endblock plugin_stylesheets %}
-
-    {% block stylesheets %}{% endblock stylesheets %}
-
     {% block preamble %}{% endblock %}
 
     {% block resources %}
         {% block css_resources %}
         {{ bokeh_css | indent(8) if bokeh_css }}
+        <link rel="stylesheet" href="static/assets/tether/tether.min.css">
+        <link rel="stylesheet" href="static/assets/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" href="static/assets/bootstrap/css/bootstrap-grid.min.css">
+        <link rel="stylesheet" href="static/assets/bootstrap/css/bootstrap-reboot.min.css">
+        <link rel="stylesheet" href="static/assets/theme/css/style.css">
+        <link rel="preload" as="style" href="static/assets/mobirise/css/mbr-additional.css">
+        <link rel="stylesheet" href="static/assets/mobirise/css/mbr-additional.css" type="text/css">
+        <link rel="stylesheet" href="static/css/style.css">
         {% endblock %}
 
         {% block js_resources %}
@@ -42,7 +39,7 @@
     <section>
       <div id="coronacontrols" class="row justify-content-end">
         <script>
-        fetch('/controls')
+        fetch('/controls?lang={{lang}}')
             .then(function(response) { return response.json(); })
             .then(function(item) { return Bokeh.embed.embed_item(item, "coronacontrols"); })
         </script>
@@ -56,7 +53,7 @@
                 <div class="image-wrapper">
                   <div id="coronaplot">
                     <script>
-                    fetch('/plot?mutation={{mutation}}')
+                    fetch('/plot?mutation={{mutation}}&lang={{lang}}')
                         .then(function(response) { return response.json(); })
                         .then(function(item) { return Bokeh.embed.embed_item(item, "coronaplot"); })
                     </script>

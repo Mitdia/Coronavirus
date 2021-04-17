@@ -18,12 +18,39 @@ class Database(object):
         self.min_date = "2020-01-01 00:00:00"
         self.max_date = "2021-02-09 00:00:00"
 
-    @property
+
     @lru_cache()
-    def regions(self):
-        # FIXME: hardcode !
-        file_for_regions = open(Path("Data", "regions.txt"), "r")
-        return file_for_regions.read().split(",")
+    def regions(self, language="EN"):
+        db = sqlite3.connect(Path("samples_data.db"))
+        result = db.execute(f"SELECT {language}_names FROM regions").fetchall()
+        regions_names = []
+        for region in result:
+            regions_names.append(region[0])
+        db.close()
+        return regions_names
+
+    @lru_cache()
+    def translate_to_eng(self, region):
+        db = sqlite3.connect(Path("samples_data.db"))
+        result = db.execute(f"""SELECT EN_names FROM regions
+                            WHERE RU_names = \"{region}\"
+        """
+        ).fetchall()
+        db.close()
+        return result[0][0]
+
+
+    @lru_cache()
+    def coordinate(self, region):
+        db = sqlite3.connect(Path("samples_data.db"))
+        result = db.execute(f"""SELECT X_coordinate, Y_coordinate FROM regions
+                            WHERE (RU_names = \"{region}\"
+                            OR EN_names = \"{region}\")
+        """
+        ).fetchall()
+        db.close()
+        return [result[0][0], result[0][1]]
+
 
     @property
     @lru_cache()
@@ -54,7 +81,8 @@ class Database(object):
             last_date = self.max_date
         result = db.execute(
             f"""SELECT COUNT(*) FROM samples_data
-                            WHERE Location = \"{region}\"
+                            WHERE (Location_RU = \"{region}\"
+                            OR Location_EN = \"{region}\")
                             AND Date <= \"{last_date}\"
                             AND Date >= \"{first_date}\";
         """
