@@ -18,7 +18,6 @@ class Database(object):
         self.min_date = "2020-01-01 00:00:00"
         self.max_date = "2021-02-09 00:00:00"
 
-
     @lru_cache()
     def regions(self, language="EN"):
         db = sqlite3.connect(Path("samples_data.db"))
@@ -32,45 +31,25 @@ class Database(object):
     @lru_cache()
     def translate_to_eng(self, region):
         db = sqlite3.connect(Path("samples_data.db"))
-        result = db.execute(f"""SELECT EN_names FROM regions
+        result = db.execute(
+            f"""SELECT EN_names FROM regions
                             WHERE RU_names = \"{region}\"
         """
         ).fetchall()
         db.close()
         return result[0][0]
 
-
     @lru_cache()
     def coordinate(self, region):
         db = sqlite3.connect(Path("samples_data.db"))
-        result = db.execute(f"""SELECT X_coordinate, Y_coordinate FROM regions
+        result = db.execute(
+            f"""SELECT X_coordinate, Y_coordinate FROM regions
                             WHERE (RU_names = \"{region}\"
                             OR EN_names = \"{region}\")
         """
         ).fetchall()
         db.close()
         return [result[0][0], result[0][1]]
-
-
-    @property
-    @lru_cache()
-    def mutation_names(self):
-        mutations_names = (
-            open(Path("Data", "mutations_names.txt"), "r").read().split(",")
-        )
-
-    # FIXME: hardcode !
-    @property
-    @lru_cache()
-    def _data(self):
-        file_for_data = open(Path("Data", "data.csv"), "r")
-        return pd.read_csv(file_for_data, header=0)
-
-    @lru_cache()
-    def data_by_region(self, region):
-        file_for_data = open(Path("Data", "data.csv"), "r")
-        data = pd.read_csv(file_for_data, header=0)
-        return data.loc[data["location"] == region]
 
     @lru_cache()
     def number_of_samples(self, region, first_date="default", last_date="default"):
@@ -117,34 +96,21 @@ class Database(object):
     @property
     @lru_cache()
     def mutations_names(self):
-        mutations_names = (
-            open(Path("Data", "mutations_names.txt"), "r").read().split(",")
-        )
+        db = sqlite3.connect(Path("samples_data.db"))
+        result = db.execute(f"SELECT mutation_name FROM mutations").fetchall()
+        mutations_names = []
+        for region in result:
+            mutations_names.append(region[0])
+        db.close()
         return mutations_names
 
-    @property
     @lru_cache()
-    def _information_about_mutations(self):
-        information_about_mutations_raw = (
-            open(Path("Data", "information_about_mutations.txt"), "r")
-            .read()
-            .split("\n")
-        )
-        information_about_mutations = {}
-        for mutation_index in range(0, len(information_about_mutations_raw) - 1, 2):
-            mutation_name = information_about_mutations_raw[mutation_index]
-            information_about_mutation = information_about_mutations_raw[
-                mutation_index + 1
-            ]
-            information_about_mutations[mutation_name] = information_about_mutation
-        return information_about_mutations
-
-    def mutation_info(self, mutation):
-        if mutation not in self.mutation_with_info_names:
-            mutation = "NOINFO"
-        return self._information_about_mutations[mutation]
-
-    @property
-    @lru_cache()
-    def mutation_with_info_names(self):
-        return self._information_about_mutations.keys()
+    def info_about_mutation(self, mutation, lang):
+        db = sqlite3.connect(Path("samples_data.db"))
+        result = db.execute(
+            f"""SELECT {lang}_header, {lang}_info FROM mutations
+                WHERE mutation_name = \"{mutation}\"
+        """
+        ).fetchall()
+        db.close()
+        return [result[0][0], result[0][1]]

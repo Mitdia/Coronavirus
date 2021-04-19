@@ -8,7 +8,7 @@ from bokeh.models import Paragraph, Select, Button
 from bokeh.resources import CDN
 from database import Database
 from flask import Flask, request, Markup, send_from_directory
-from helpers.plot import create_main_map, create_map, render_text, create_controls
+from helpers.plot import create_main_map, create_map, create_controls
 from jinja2 import Environment, PackageLoader, Template
 from loguru import logger
 from settings import SERVER_ADDRESS, SERVER_PORT
@@ -27,8 +27,8 @@ logger.add(
 
 @app.route("/plot")
 def plot():
-    mutation = request.args.get("mutation", default = "ALL", type=str)
-    language = request.args.get("lang", default = "EN", type=str)
+    mutation = request.args.get("mutation", default="ALL", type=str)
+    language = request.args.get("lang", default="EN", type=str)
     if mutation == "ALL":
         p = create_main_map(db, language)
     elif mutation in db.mutations_names:
@@ -36,41 +36,36 @@ def plot():
     return json_item(p, "coronaplot")
 
 
-@app.route("/text")
-def text():
-    mutation = request.args.get("mutation", default = "ALL", type=str)
-    if mutation not in db.mutation_with_info_names:
-        mutation = "NOINFO"
-    p = render_text(db, mutation)
-    return json_item(p, "coronatext")
-
-
 @app.route("/controls")
 def controls():
-    language = request.args.get("lang", default = "EN", type=str)
+    language = request.args.get("lang", default="EN", type=str)
     p = create_controls(db, language)
     return json_item(p, "coronacontrols")
 
 
-
 @app.route("/")
 def root():
-    mutation = request.args.get("mutation", default = "", type=str)
-    language = request.args.get("lang", default = "EN", type=str)
+    mutation = request.args.get("mutation", default="ALL", type=str)
+    language = request.args.get("lang", default="EN", type=str)
     if mutation not in db.mutations_names:
         mutation = "ALL"
     if language != "RU":
         language = "EN"
-    mutation_info = db.mutation_info(mutation)
+    mutation_info = db.info_about_mutation(mutation, language)
+    mutation_info_header = mutation_info[0]
+    mutation_info = mutation_info[1]
     return file_html(
         # [controls, last_module],
         [figure(), Paragraph(), Select(), Button()],  # TODO: remove me CDN only
         CDN,
         "Coronavirus",
         template=jinja_env.get_template("index.html"),
-        template_variables={"mutation": mutation,
-                            "mutation_info": mutation_info,
-                            "lang": language}
+        template_variables={
+            "mutation": mutation,
+            "mutation_info_header": mutation_info_header,
+            "mutation_info": mutation_info,
+            "lang": language,
+        },
     )
 
 

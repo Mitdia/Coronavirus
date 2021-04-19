@@ -26,7 +26,7 @@ def configure_plot():
         tools=tools,
         toolbar_location="right",
         sizing_mode="scale_width",
-        margin=[0, 0, 0, 90]
+        margin=[0, 0, 0, 90],
     )
     p.grid.visible = False
     p.axis.visible = False
@@ -43,18 +43,6 @@ def configure_plot():
         anchor="bottom_left",
     )
     return p
-
-
-def render_text(db, name):
-    information_about_mutation = db.mutation_info(name)
-    text = Paragraph(
-        text=information_about_mutation,
-        width=(PLT_WIDTH // 2),
-        height=PLT_HEIGHT,
-        margin=[0, 100, 0, 100],
-    )
-    layout = column(text, sizing_mode="scale_width")
-    return layout
 
 
 def create_main_map(db, lang):
@@ -162,30 +150,37 @@ def create_controls(db, lang, address="http://localhost:5006"):
         title=titles[0],
         value=mutations_names[0],
         options=mutations_names,
-        margin=[0, 100, 0, 100]
+        margin=[0, 100, 0, 100],
     )
     button = Button(
-        min_height=50,
-        label=titles[1],
-        button_type="success",
-        margin=[50, 25, 0, 100]
+        min_height=50, label=titles[1], button_type="success", margin=[50, 25, 0, 100]
     )
     text = Paragraph(
         text=welcome_text,
-        css_classes = ["welcome_text"],
+        css_classes=["welcome_text"],
         margin=[50, 100, 0, 100],
     )
     lang_switch = Button(
-        min_height=50,
-        label=lang,
-        button_type="success",
-        margin=[50, 100, 0, 25]
+        min_height=50, label=lang, button_type="success", margin=[50, 100, 0, 25]
     )
-    select.js_on_change("value", CustomJS(code=f"window.location.href=('{address}/?mutation=' + this.value + '&lang={lang}')"))
-    button.js_on_click(CustomJS(code=f"window.location.href=('{address}/?mutation=ALL&lang={lang}')"))
-    lang_switch.js_on_click(CustomJS(code=f"""var url_string = window.location.href;
+    select.js_on_change(
+        "value",
+        CustomJS(
+            code=f"window.location.href=('{address}/?mutation=' + this.value + '&lang={lang}')"
+        ),
+    )
+    button.js_on_click(
+        CustomJS(code=f"window.location.href=('{address}/?mutation=ALL&lang={lang}')")
+    )
+    lang_switch.js_on_click(
+        CustomJS(
+            code=f"""var url_string = window.location.href;
                                               var url = new URL(url_string);
                                               var mutation = url.searchParams.get("mutation");
-                                              window.location.href=(`{address}/?mutation=${{mutation}}&lang={lang_sw}`)"""))
-    controls = row(column(row(button, lang_switch), select), text, sizing_mode="scale_width")
+                                              window.location.href=(`{address}/?mutation=${{mutation}}&lang={lang_sw}`)"""
+        )
+    )
+    controls = row(
+        column(row(button, lang_switch), select), text, sizing_mode="scale_width"
+    )
     return controls
