@@ -24,9 +24,9 @@ def configure_plot():
         plot_height=PLT_HEIGHT,
         tooltips=TOOLTIPS,
         tools=tools,
-        toolbar_location="right",
+        toolbar_location=None,
         sizing_mode="scale_width",
-        margin=[0, 0, 0, 90],
+        margin=[0, 50, 0, 10],
     )
     p.grid.visible = False
     p.axis.visible = False
@@ -161,7 +161,9 @@ def create_controls(db, lang, address="http://localhost:5006"):
         margin=[50, 100, 0, 100],
     )
     lang_switch = Button(
-        min_height=50, label=lang, button_type="success", margin=[50, 100, 0, 25]
+        label=lang_sw,
+        margin=[50, 100, 0, 25],
+        aspect_ratio = 1
     )
     select.js_on_change(
         "value",
@@ -184,3 +186,57 @@ def create_controls(db, lang, address="http://localhost:5006"):
         column(row(button, lang_switch), select), text, sizing_mode="scale_width"
     )
     return controls
+
+def create_lang_switch(db, lang):
+    if lang == "RU":
+        lang_sw = "EN"
+    else:
+        lang_sw = "RU"
+    lang_switch = Button(
+        label=lang_sw,
+        margin=[40, 100, 0, 25],
+        aspect_ratio = 1
+    )
+    lang_switch.js_on_click(
+        CustomJS(
+            code=f"""var url_string = window.location.href;
+                                              var url = new URL(url_string);
+                                              var mutation = url.searchParams.get("mutation");
+                                              window.location.href=(`/?mutation=${{mutation}}&lang={lang_sw}`)"""
+        )
+    )
+    return lang_switch
+
+def create_select(db, lang):
+    if lang == "RU":
+        titles = ["Мутация"]
+    else:
+        titles = ["Mutation"]
+    mutations_names = db.mutations_names
+    select = Select(
+        min_height=50,
+        title=titles[0],
+        value=mutations_names[0],
+        options=mutations_names,
+        margin=[30, 100, 0, 25],
+    )
+    select.js_on_change(
+        "value",
+        CustomJS(
+            code=f"window.location.href=('/?mutation=' + this.value + '&lang={lang}')"
+        ),
+    )
+    return select
+
+def create_home_button(db, lang):
+    if lang == "RU":
+        titles = ["Число образцов по регионам"]
+    else:
+        titles = ["Number of samples per region"]
+    button = Button(
+        min_height=50, label=titles[0], button_type="success", margin=[30, 100, 0, 25],
+    )
+    button.js_on_click(
+        CustomJS(code=f"window.location.href=('/?mutation=ALL&lang={lang}')")
+    )
+    return button

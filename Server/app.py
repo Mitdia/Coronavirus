@@ -8,7 +8,7 @@ from bokeh.models import Paragraph, Select, Button
 from bokeh.resources import CDN
 from database import Database
 from flask import Flask, request, Markup, send_from_directory
-from helpers.plot import create_main_map, create_map, create_controls
+from helpers.plot import create_main_map, create_map, create_select, create_lang_switch, create_home_button
 from jinja2 import Environment, PackageLoader, Template
 from loguru import logger
 from settings import SERVER_ADDRESS, SERVER_PORT
@@ -43,6 +43,27 @@ def controls():
     return json_item(p, "coronacontrols")
 
 
+@app.route("/button")
+def home_button():
+    language = request.args.get("lang", default="EN", type=str)
+    p = create_home_button(db, language)
+    return json_item(p, "home_button")
+
+
+@app.route("/lang_switch")
+def lang_switch():
+    language = request.args.get("lang", default="EN", type=str)
+    p = create_lang_switch(db, language)
+    return json_item(p, "language_switch")
+
+
+@app.route("/select")
+def select():
+    language = request.args.get("lang", default="EN", type=str)
+    p = create_select(db, language)
+    return json_item(p, "select")
+
+
 @app.route("/")
 def root():
     mutation = request.args.get("mutation", default="ALL", type=str)
@@ -54,6 +75,7 @@ def root():
     mutation_info = db.info_about_mutation(mutation, language)
     mutation_info_header = mutation_info[0]
     mutation_info = mutation_info[1]
+    welcome_text = db.welcome_text(language)
     return file_html(
         # [controls, last_module],
         [figure(), Paragraph(), Select(), Button()],  # TODO: remove me CDN only
@@ -64,6 +86,7 @@ def root():
             "mutation": mutation,
             "mutation_info_header": mutation_info_header,
             "mutation_info": mutation_info,
+            "welcome_text": welcome_text,
             "lang": language,
         },
     )

@@ -7,68 +7,86 @@
 <head>
     {% block inner_head %}
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{{ title | e if title else "Bokeh Plot" }}{% endblock %}</title>
 
     {% block preamble %}{% endblock %}
 
     {% block resources %}
         {% block css_resources %}
-        {{ bokeh_css | indent(8) if bokeh_css }}
-        <link rel="stylesheet" href="static/assets/tether/tether.min.css">
-        <link rel="stylesheet" href="static/assets/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" href="static/assets/bootstrap/css/bootstrap-grid.min.css">
-        <link rel="stylesheet" href="static/assets/bootstrap/css/bootstrap-reboot.min.css">
-        <link rel="stylesheet" href="static/assets/theme/css/style.css">
-        <link rel="preload" as="style" href="static/assets/mobirise/css/mbr-additional.css">
-        <link rel="stylesheet" href="static/assets/mobirise/css/mbr-additional.css" type="text/css">
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <style>
+        html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
+        </style>
         <link rel="stylesheet" href="static/css/style.css">
+
+        {{ bokeh_css | indent(8) if bokeh_css }}
         {% endblock %}
 
         {% block js_resources %}
         {{ bokeh_js | indent(8) if bokeh_js }}
         {% endblock %}
     {% endblock %}
-
     {% block postamble %}{% endblock %}
     {% endblock %}
 </head>
 {% endblock %}
 {% block body %}
 <body>
+  <header class="w3-bar w3-green">
+    <img src="static/img/logo.png" class="w3-image w3-margin" width="100" height="100">
 
-    <section>
-      <div id="coronacontrols" class="row justify-content-end">
+    <div class="w3-right" id="language_switch">
+      <script>
+      fetch('/lang_switch?lang={{lang}}')
+          .then(function(response) { return response.json(); })
+          .then(function(item) { return Bokeh.embed.embed_item(item, "language_switch"); })
+      </script>
+    </div>
+
+    <div class="w3-right" id="button">
+      <script>
+      fetch('/button?lang={{lang}}')
+          .then(function(response) { return response.json(); })
+          .then(function(item) { return Bokeh.embed.embed_item(item, "button"); })
+      </script>
+    </div>
+
+    <div class="w3-right" id="select">
+      <script>
+      fetch('/select?lang={{lang}}')
+          .then(function(response) { return response.json(); })
+          .then(function(item) { return Bokeh.embed.embed_item(item, "select"); })
+      </script>
+    </div>
+  </header>
+
+  <div class="w3-container w3-center">
+    <p class="welcome_text">
+      {{welcome_text}}
+    </p>
+  </div>
+
+  <div class="w3-row">
+    <div class="w3-col m8 20">
+      <div id="coronaplot">
         <script>
-        fetch('/controls?lang={{lang}}')
+        fetch('/plot?mutation={{mutation}}&lang={{lang}}')
             .then(function(response) { return response.json(); })
-            .then(function(item) { return Bokeh.embed.embed_item(item, "coronacontrols"); })
+            .then(function(item) { return Bokeh.embed.embed_item(item, "coronaplot"); })
         </script>
       </div>
-  </section>
-
-  <section class="image1 cid-suyHhN56z8" id="image1-7">
-    <div>
-        <div class="row align-items-center">
-            <div class="col-12 col-lg-8">
-                <div class="image-wrapper">
-                  <div id="coronaplot">
-                    <script>
-                    fetch('/plot?mutation={{mutation}}&lang={{lang}}')
-                        .then(function(response) { return response.json(); })
-                        .then(function(item) { return Bokeh.embed.embed_item(item, "coronaplot"); })
-                    </script>
-                  </div>
-                </div>
-            </div>
-            <div class="col-12 col-lg-4">
-                <div class="text-wrapper">
-                    <h3 class="mbr-section-title mbr-fonts-style mb-3 display-5">
-                        <strong>{{mutation_info_header}}</strong></h3>
-                          <p class="mbr-text mbr-fonts-style display-7">{{mutation_info}}</p>
-                </div>
-            </div>
-        </div>
     </div>
+    <div class="w3-col m4 20">
+      <h3 class="info_header_text">
+      <strong>{{mutation_info_header}}</strong></h3>
+      <p class="info_text">{{mutation_info}}</p>
+    </div>
+  </div>
+
 </body>
 {% endblock %}
 </html>

@@ -114,3 +114,39 @@ class Database(object):
         ).fetchall()
         db.close()
         return [result[0][0], result[0][1]]
+
+    @lru_cache()
+    def welcome_text(self, lang):
+        db = sqlite3.connect(Path("samples_data.db"))
+        result = db.execute(
+            f"""SELECT text_body_{lang} FROM information_text
+                WHERE text_name = "welcome"
+        """
+        ).fetchall()
+        db.close()
+        result = list(result)[0][0]
+        return result
+
+    def add_mutation_info(self, mutation, info, lang):
+            db = sqlite3.connect(Path("samples_data.db"))
+            db.execute(
+                f"""UPDATE mutations
+                    SET {lang}_info = {info}
+                    WHERE mutation_name = {mutation};
+            """
+            )
+            db.commit()
+            db.close()
+            return
+
+    def add_mutation_info(self, mutation, info, lang):
+            db = sqlite3.connect(Path("samples_data.db"))
+            db.execute(
+                f"""UPDATE mutations
+                    SET {lang}_info = {info}
+                    WHERE mutation_name = {mutation};
+            """
+            )
+            db.commit()
+            db.close()
+            return
