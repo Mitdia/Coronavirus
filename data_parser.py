@@ -54,7 +54,7 @@ def parse_data(
                 ]
                 pandas_index += 1
 
-    dbase = sqlite3.connect("samples_data.db")
+    dbase = sqlite3.connect("samples_data.sqlite")
     mutation_data.to_sql("data_about_mutations", dbase, if_exists="replace")
     data.to_sql("samples_data", dbase, if_exists="replace")
     dbase.execute("""DROP TABLE IF EXISTS 'mutations';""")
@@ -118,7 +118,7 @@ def parse_regions(adress=Path("Data", "RegionsInGADM.txt")):
         else:
             region_index += 1
 
-    dbase = sqlite3.connect("samples_data.db")
+    dbase = sqlite3.connect("samples_data.sqlite")
     dbase.execute("""DROP TABLE IF EXISTS 'regions';""")
     dbase.execute(
         """CREATE TABLE regions (

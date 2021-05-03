@@ -36,3 +36,6 @@ typed-ast==1.4.2
 typing-extensions==3.7.4.3
 Werkzeug==1.0.1
 wrapt==1.12.1
+Flask_Admin==1.5.8
+SQLAlchemy==1.4.12
+Flask-SQLAlchemy==2

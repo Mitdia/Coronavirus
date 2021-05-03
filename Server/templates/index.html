@@ -64,14 +64,16 @@
     </div>
   </header>
 
-  <div class="w3-container w3-center">
+  <div class="w3-container w3-center w3-border w3-border-red w3-round-xxlarge w3-center w3-margin w3-grey">
     <p class="welcome_text">
       {{welcome_text}}
     </p>
   </div>
 
   <div class="w3-row">
-    <div class="w3-col m8 20">
+    <div class="w3-col m1 20">
+    </div>
+    <div class="w3-col m7 20 w3-border w3-border-red w3-round-xxlarge w3-margin">
       <div id="coronaplot">
         <script>
         fetch('/plot?mutation={{mutation}}&lang={{lang}}')
@@ -80,12 +82,25 @@
         </script>
       </div>
     </div>
-    <div class="w3-col m4 20">
+    <div class="w3-col m3 20 w3-border w3-border-red w3-round-xxlarge w3-center w3-margin">
       <h3 class="info_header_text">
       <strong>{{mutation_info_header}}</strong></h3>
       <p class="info_text">{{mutation_info}}</p>
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="w3-container w3-padding-64 w3-center w3-opacity">
+    <div class="w3-xlarge w3-padding-32">
+      <i class="fa fa-facebook-official w3-hover-opacity"></i>
+      <i class="fa fa-instagram w3-hover-opacity"></i>
+      <i class="fa fa-snapchat w3-hover-opacity"></i>
+      <i class="fa fa-pinterest-p w3-hover-opacity"></i>
+      <i class="fa fa-twitter w3-hover-opacity"></i>
+      <i class="fa fa-linkedin w3-hover-opacity"></i>
+   </div>
+   <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+  </footer>
 
 </body>
 {% endblock %}

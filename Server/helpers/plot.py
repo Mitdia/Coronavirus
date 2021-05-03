@@ -26,11 +26,10 @@ def configure_plot():
         tools=tools,
         toolbar_location=None,
         sizing_mode="scale_width",
-        margin=[0, 50, 0, 10],
     )
     p.grid.visible = False
     p.axis.visible = False
-    p.outline_line_color = "green"
+    p.outline_line_width = 0
     p.match_aspect = True
     p.toolbar.active_scroll = zoom
 

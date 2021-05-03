@@ -20,7 +20,7 @@ class Database(object):
 
     @lru_cache()
     def regions(self, language="EN"):
-        db = sqlite3.connect(Path("samples_data.db"))
+        db = sqlite3.connect(Path("samples_data.sqlite"))
         result = db.execute(f"SELECT {language}_names FROM regions").fetchall()
         regions_names = []
         for region in result:
@@ -30,7 +30,7 @@ class Database(object):
 
     @lru_cache()
     def translate_to_eng(self, region):
-        db = sqlite3.connect(Path("samples_data.db"))
+        db = sqlite3.connect(Path("samples_data.sqlite"))
         result = db.execute(
             f"""SELECT EN_names FROM regions
                             WHERE RU_names = \"{region}\"
@@ -41,7 +41,7 @@ class Database(object):
 
     @lru_cache()
     def coordinate(self, region):
-        db = sqlite3.connect(Path("samples_data.db"))
+        db = sqlite3.connect(Path("samples_data.sqlite"))
         result = db.execute(
             f"""SELECT X_coordinate, Y_coordinate FROM regions
                             WHERE (RU_names = \"{region}\"
@@ -53,7 +53,7 @@ class Database(object):
 
     @lru_cache()
     def number_of_samples(self, region, first_date="default", last_date="default"):
-        db = sqlite3.connect(Path("samples_data.db"))
+        db = sqlite3.connect(Path("samples_data.sqlite"))
         if first_date == "default":
             first_date = self.min_date
         if last_date == "default":
@@ -74,7 +74,7 @@ class Database(object):
     def number_of_mutatated_variants(
         self, mutation, region, first_date="default", last_date="default"
     ):
-        db = sqlite3.connect(Path("samples_data.db"))
+        db = sqlite3.connect(Path("samples_data.sqlite"))
         if first_date == "default":
             first_date = self.min_date
         if last_date == "default":
@@ -96,7 +96,7 @@ class Database(object):
     @property
     @lru_cache()
     def mutations_names(self):
-        db = sqlite3.connect(Path("samples_data.db"))
+        db = sqlite3.connect(Path("samples_data.sqlite"))
         result = db.execute(f"SELECT mutation_name FROM mutations").fetchall()
         mutations_names = []
         for region in result:
@@ -106,7 +106,7 @@ class Database(object):
 
     @lru_cache()
     def info_about_mutation(self, mutation, lang):
-        db = sqlite3.connect(Path("samples_data.db"))
+        db = sqlite3.connect(Path("samples_data.sqlite"))
         result = db.execute(
             f"""SELECT {lang}_header, {lang}_info FROM mutations
                 WHERE mutation_name = \"{mutation}\"
@@ -117,7 +117,7 @@ class Database(object):
 
     @lru_cache()
     def welcome_text(self, lang):
-        db = sqlite3.connect(Path("samples_data.db"))
+        db = sqlite3.connect(Path("samples_data.sqlite"))
         result = db.execute(
             f"""SELECT text_body_{lang} FROM information_text
                 WHERE text_name = "welcome"
@@ -128,7 +128,7 @@ class Database(object):
         return result
 
     def add_mutation_info(self, mutation, info, lang):
-            db = sqlite3.connect(Path("samples_data.db"))
+            db = sqlite3.connect(Path("samples_data.sqlite"))
             db.execute(
                 f"""UPDATE mutations
                     SET {lang}_info = {info}
@@ -140,7 +140,7 @@ class Database(object):
             return
 
     def add_mutation_info(self, mutation, info, lang):
-            db = sqlite3.connect(Path("samples_data.db"))
+            db = sqlite3.connect(Path("samples_data.sqlite"))
             db.execute(
                 f"""UPDATE mutations
                     SET {lang}_info = {info}
