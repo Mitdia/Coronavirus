@@ -20,7 +20,28 @@ def parse_data(
 
     mutations_names = []
     for mutations in data[3]:
-        for mutation_name in mutations.split(","):
+        for mutation_name_raw in mutations.split(","):
+            if mutation_name_raw == "":
+                continue
+            mutation_name = [0, 0, "", "", ""]
+            mutation_name[4], mutation_name[1] = mutation_name_raw.split(":")
+            mutation_name[0] = genes.index(mutation_name[4])
+
+            rodata = mutation_name[1][1:]
+            number = 0
+            count = 1
+            for i in range(len(rodata)):
+                num = rodata[i]
+                if num in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]:
+                    number *= 10
+                    number += ord(num) - ord("0")
+                    count += 1
+                else:
+                    break
+            mutation_name[3] = mutation_name[1][count:]
+            mutation_name[2] = mutation_name[1][0]
+            mutation_name[1] = number
+
             if mutation_name not in mutations_names and mutation_name != "":
                 mutations_names.append(mutation_name)
     mutations_names.sort()
@@ -81,6 +102,7 @@ def parse_data(
     )
 
     for mutation in mutations_names:
+        mutation = mutation[4] + ":" + mutation[2] + str(mutation[1]) + mutation[3]
         dbase.execute(
             f"""INSERT INTO mutations
                          (mutation_name, RU_header, EN_header, RU_info, EN_info)
@@ -153,29 +175,40 @@ blocked = [
     "Crimea",
     "Sevastopol'",
 ]
+
+genes = [
+    "leader",
+    "nsp2",
+    "nsp3",
+    "nsp4",
+    "3C",
+    "nsp6",
+    "nsp7",
+    "nsp8",
+    "nsp9",
+    "nsp10",
+    "RdRp",
+    "helicase",
+    "exonuclease",
+    "endornase",
+    "methyltransferase",
+    "nsp11",
+    "ORF1a",
+    "ORF1b",
+    "S",
+    "ORF3a",
+    "E",
+    "M",
+    "ORF6",
+    "ORF7a",
+    "ORF7b",
+    "ORF8",
+    "N",
+    "ORF10",
+]
 regions, regions_dictionary = parse_regions()
 mutations_names = parse_data(regions)
 file_for_regions = open(Path("Data", "regions.txt"), "w", encoding="utf-8")
 file_for_mutations_names = open(
     Path("Data", "mutations_names.txt"), "w", encoding="utf-8"
 )
-
-for region_index in range(len(regions)):
-    if region_index != len(regions) - 1:
-        print(f"{regions[region_index]}", file=file_for_regions, end=",")
-    else:
-        print(f"{regions[region_index]}", file=file_for_regions, end="")
-
-for mutation_name_index in range(len(mutations_names)):
-    if mutation_name_index != len(mutations_names) - 1:
-        print(
-            f"{mutations_names[mutation_name_index]}",
-            file=file_for_mutations_names,
-            end=",",
-        )
-    else:
-        print(
-            f"{mutations_names[mutation_name_index]}",
-            file=file_for_mutations_names,
-            end="",
-        )

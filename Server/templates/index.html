@@ -39,28 +39,14 @@
   <header class="w3-bar w3-green">
     <img src="static/img/logo.png" class="w3-image w3-margin" width="100" height="100">
 
-    <div class="w3-right" id="language_switch">
-      <script>
-      fetch('/lang_switch?lang={{lang}}')
-          .then(function(response) { return response.json(); })
-          .then(function(item) { return Bokeh.embed.embed_item(item, "language_switch"); })
-      </script>
-    </div>
 
-    <div class="w3-right" id="button">
-      <script>
-      fetch('/button?lang={{lang}}')
-          .then(function(response) { return response.json(); })
-          .then(function(item) { return Bokeh.embed.embed_item(item, "button"); })
-      </script>
-    </div>
-
-    <div class="w3-right" id="select">
-      <script>
-      fetch('/select?lang={{lang}}')
-          .then(function(response) { return response.json(); })
-          .then(function(item) { return Bokeh.embed.embed_item(item, "select"); })
-      </script>
+    <div onclick="switch_lang()" class="w3-right w3-button">{{lang_sw}}</div>
+    <div onclick="home()" class="w3-right w3-button">{{home_button_text}}</div>
+    <div class="w3-dropdown-click w3-right">
+      <button onclick="myFunction()" class="w3-button w3-black">
+        {{mutation_choice_button_text}}
+      </button>
+      <div id="dropdown" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
     </div>
   </header>
 
@@ -71,21 +57,14 @@
   </div>
 
   <div class="w3-row">
-    <div class="w3-col m1 20">
-    </div>
-    <div class="w3-col m7 20 w3-border w3-border-red w3-round-xxlarge w3-margin">
+    <div class="w3-margin">
       <div id="coronaplot">
         <script>
-        fetch('/plot?mutation={{mutation}}&lang={{lang}}')
+        fetch('/plot?mutation={{mutation}}&lang={{lang}}&max_date={{max_date}}&min_date={{min_date}}')
             .then(function(response) { return response.json(); })
             .then(function(item) { return Bokeh.embed.embed_item(item, "coronaplot"); })
         </script>
       </div>
-    </div>
-    <div class="w3-col m3 20 w3-border w3-border-red w3-round-xxlarge w3-center w3-margin">
-      <h3 class="info_header_text">
-      <strong>{{mutation_info_header}}</strong></h3>
-      <p class="info_text">{{mutation_info}}</p>
     </div>
   </div>
 
@@ -102,6 +81,59 @@
    <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
   </footer>
 
+<script>
+  var dropdown = document.getElementById("dropdown");
+  var mutations = {{mutations_names}};
+  var url_string = window.location.href;
+  var url = new URL(url_string);
+  var language = url.searchParams.get("lang");
+  var max_date = url.searchParams.get("max_date");
+  var min_date = url.searchParams.get("min_date");
+  for (var i = 0; i < mutations.length; i++) {
+    var mutation = mutations[i];
+    var element = document.createElement("a");
+    element.textContent = mutation;
+    element.className = "w3-bar-item w3-button";
+    element.href = `/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`;
+    dropdown.appendChild(element);
+  }
+
+  function switch_lang() {
+    var url_string = window.location.href;
+    var url = new URL(url_string);
+    var mutation = url.searchParams.get("mutation");
+    var language = url.searchParams.get("lang");
+    var max_date = url.searchParams.get("max_date");
+    var min_date = url.searchParams.get("min_date");
+    if (language == "EN")
+    {
+      language = "RU";
+    }
+    else
+    {
+      language = "EN";
+    }
+    window.location.href=(`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+  }
+  function home() {
+    var url_string = window.location.href;
+    var url = new URL(url_string);
+    var language = url.searchParams.get("lang");
+    var max_date = url.searchParams.get("max_date");
+    var min_date = url.searchParams.get("min_date");
+    window.location.href=(`/?mutation=ALL&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+  }
+
+  function myFunction() {
+  var x = document.getElementById("dropdown");
+  if (x.className.indexOf("w3-show") == -1) {
+    x.className += " w3-show";
+  } else {
+    x.className = x.className.replace(" w3-show", "");
+  }
+  }
+
+</script>
 </body>
 {% endblock %}
 </html>

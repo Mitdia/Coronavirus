@@ -2,9 +2,10 @@ from math import log2, pi
 
 from functools import lru_cache
 from bokeh.layouts import column, row
-from bokeh.models import Paragraph, Select, Button, CustomJS
+from bokeh.models import Paragraph, Select, Button, CustomJS, DateRangeSlider
 from bokeh.models.tools import HoverTool, PanTool, ResetTool, WheelZoomTool
 from bokeh.plotting import figure
+from datetime import date
 from settings import PLT_HEIGHT, PLT_WIDTH
 
 
@@ -44,11 +45,36 @@ def configure_plot():
     return p
 
 
-def create_main_map(db, lang):
+def create_main_map(db, lang, min_date, max_date):
     p = configure_plot()
+    mind = [int(i) for i in min_date.split("-")]
+    maxd = [int(i) for i in max_date.split("-")]
+    date_range_slider = DateRangeSlider(
+        value=(date(mind[0], mind[1], mind[2]), date(maxd[0], maxd[1], maxd[2])),
+        start=date(2019, 1, 1),
+        end=date(2021, 12, 31),
+        width_policy="max",
+    )
+    date_range_slider.js_on_change(
+        "value",
+        CustomJS(
+            code="""
+            var url_string = window.location.href;
+            var url = new URL(url_string);
+            var language = url.searchParams.get("lang");
+            var min_timestamp = this.value[0];
+            var max_timestamp = this.value[1];
+            var min_date = new Date(min_timestamp);
+            var str_min_date = min_date.getFullYear() + "-" + (min_date.getMonth() + 1) + "-" + min_date.getDate();
+            var max_date = new Date(max_timestamp);
+            var str_max_date = max_date.getFullYear() + "-" + (max_date.getMonth() + 1) + "-" + max_date.getDate();
+            window.location.href=(`/?mutation=ALL&lang=${language}&min_date=${str_min_date}&max_date=${str_max_date}`);"""
+        ),
+    )
+
     for region in db.regions(lang):
         coordinates_of_region = db.coordinate(region)
-        number_of_samples = db.number_of_samples(region)
+        number_of_samples = db.number_of_samples(region, min_date, max_date)
         radius = log2(number_of_samples + 1) * 5
         p.circle(
             x=coordinates_of_region[0],
@@ -58,19 +84,44 @@ def create_main_map(db, lang):
             fill_color="blue",
             name=f"{region}: {number_of_samples}",
         )
-    layout = column(p, sizing_mode="scale_width")
+    layout = column(p, date_range_slider, sizing_mode="scale_width")
     return layout
 
 
-def create_map(db, mutation_name, lang):
+def create_map(db, mutation_name, lang, min_date, max_date):
     p = configure_plot()
+    mind = [int(i) for i in min_date.split("-")]
+    maxd = [int(i) for i in max_date.split("-")]
+    date_range_slider = DateRangeSlider(
+        value=(date(mind[0], mind[1], mind[2]), date(maxd[0], maxd[1], maxd[2])),
+        start=date(2019, 1, 1),
+        end=date(2021, 12, 31),
+        width_policy="max",
+    )
+    date_range_slider.js_on_change(
+        "value",
+        CustomJS(
+            code="""
+            var url_string = window.location.href;
+            var url = new URL(url_string);
+            var language = url.searchParams.get("lang");
+            var mutation = url.searchParams.get("mutation");
+            var min_timestamp = this.value[0];
+            var max_timestamp = this.value[1];
+            var min_date = new Date(min_timestamp);
+            var str_min_date = min_date.getFullYear() + "-" + (min_date.getMonth() + 1) + "-" + min_date.getDate();
+            var max_date = new Date(max_timestamp);
+            var str_max_date = max_date.getFullYear() + "-" + (max_date.getMonth() + 1) + "-" + max_date.getDate();
+            window.location.href=(`/?mutation=${mutation}&lang=${language}&min_date=${str_min_date}&max_date=${str_max_date}`);"""
+        ),
+    )
     if lang == "RU":
         no_data_text = "данные отсутсвуют"
     else:
         no_data_text = "no data"
     for region in db.regions(lang):
         coordinates_of_region = db.coordinate(region)
-        all_variants = db.number_of_samples(region)
+        all_variants = db.number_of_samples(region, min_date, max_date)
         if all_variants == 0:
             p.circle(
                 x=coordinates_of_region[0],
@@ -81,7 +132,9 @@ def create_map(db, mutation_name, lang):
                 name=f"{region}: {no_data_text}",
             )
             continue
-        mutated_variants = db.number_of_mutatated_variants(mutation_name, region)
+        mutated_variants = db.number_of_mutatated_variants(
+            mutation_name, region, min_date, max_date
+        )
         nonmutated_variants = all_variants - mutated_variants
         if nonmutated_variants == 0:
             p.circle(
@@ -130,7 +183,7 @@ def create_map(db, mutation_name, lang):
                 alpha=0.8,
             )
 
-    layout = column(p, sizing_mode="scale_width")
+    layout = column(p, date_range_slider, sizing_mode="scale_width")
     return layout
 
 
@@ -159,11 +212,7 @@ def create_controls(db, lang, address="http://localhost:5006"):
         css_classes=["welcome_text"],
         margin=[50, 100, 0, 100],
     )
-    lang_switch = Button(
-        label=lang_sw,
-        margin=[50, 100, 0, 25],
-        aspect_ratio = 1
-    )
+    lang_switch = Button(label=lang_sw, margin=[50, 100, 0, 25], aspect_ratio=1)
     select.js_on_change(
         "value",
         CustomJS(
@@ -186,25 +235,23 @@ def create_controls(db, lang, address="http://localhost:5006"):
     )
     return controls
 
+
 def create_lang_switch(db, lang):
     if lang == "RU":
         lang_sw = "EN"
     else:
         lang_sw = "RU"
-    lang_switch = Button(
-        label=lang_sw,
-        margin=[40, 100, 0, 25],
-        aspect_ratio = 1
-    )
+    lang_switch = Button(label=lang_sw, margin=[40, 100, 0, 25], aspect_ratio=1)
     lang_switch.js_on_click(
         CustomJS(
             code=f"""var url_string = window.location.href;
-                                              var url = new URL(url_string);
-                                              var mutation = url.searchParams.get("mutation");
-                                              window.location.href=(`/?mutation=${{mutation}}&lang={lang_sw}`)"""
+                      var url = new URL(url_string);
+                      var mutation = url.searchParams.get("mutation");
+                      window.location.href=(`/?mutation=${{mutation}}&lang={lang_sw}`)"""
         )
     )
     return lang_switch
+
 
 def create_select(db, lang):
     if lang == "RU":
@@ -227,13 +274,17 @@ def create_select(db, lang):
     )
     return select
 
+
 def create_home_button(db, lang):
     if lang == "RU":
         titles = ["Число образцов по регионам"]
     else:
         titles = ["Number of samples per region"]
     button = Button(
-        min_height=50, label=titles[0], button_type="success", margin=[30, 100, 0, 25],
+        min_height=50,
+        label=titles[0],
+        button_type="success",
+        margin=[30, 100, 0, 25],
     )
     button.js_on_click(
         CustomJS(code=f"window.location.href=('/?mutation=ALL&lang={lang}')")
