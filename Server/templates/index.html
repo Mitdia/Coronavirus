@@ -56,8 +56,11 @@
     </p>
   </div>
 
-  <div class="w3-row">
-    <div class="w3-margin">
+  <div class="w3-row w3-margin w3-padding">
+    <p class="w3-strong info_header_text">
+      {{mutation_info_header}}
+    </p>
+    <div class="w3-border">
       <div id="coronaplot">
         <script>
         fetch('/plot?mutation={{mutation}}&lang={{lang}}&max_date={{max_date}}&min_date={{min_date}}')
