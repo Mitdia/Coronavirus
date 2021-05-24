@@ -35,6 +35,7 @@
 </head>
 {% endblock %}
 {% block body %}
+
 <body>
   <header class="w3-bar w3-green">
     <img src="static/img/logo.png" class="w3-image w3-margin" width="100" height="100">
@@ -43,10 +44,10 @@
     <div onclick="switch_lang()" class="w3-right w3-button">{{lang_sw}}</div>
     <div onclick="home()" class="w3-right w3-button">{{home_button_text}}</div>
     <div class="w3-dropdown-click w3-right">
-      <button onclick="myFunction()" class="w3-button w3-black">
+      <button onclick="myFunction('dropdown')" class="w3-button w3-black">
         {{mutation_choice_button_text}}
       </button>
-      <div id="dropdown" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
+      <div id="dropdown:" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
     </div>
   </header>
 
@@ -60,14 +61,19 @@
     <p class="w3-strong info_header_text">
       {{mutation_info_header}}
     </p>
-    <div class="w3-border">
-      <div id="coronaplot">
-        <script>
-        fetch('/plot?mutation={{mutation}}&lang={{lang}}&max_date={{max_date}}&min_date={{min_date}}')
-            .then(function(response) { return response.json(); })
-            .then(function(item) { return Bokeh.embed.embed_item(item, "coronaplot"); })
-        </script>
+    <div class="w3-row w3-green">
+      <div class="w3-container w3-padding-24 w3-col l10 m9 s8">
+        <div id="dateRangeSlider"></div>
       </div>
+      <div onclick="updateDate('{{min_date}}', '{{max_date}}')" class="w3-green w3-button w3-col l2 m3 s4" id="updateDate">
+        <p>{{update_button_text}}:</p>
+        <p class="w3-strong" id="updateDateText">
+          {{min_date}} - {{max_date}}
+        </p>
+      </div>
+    </div>
+    <div class="w3-border">
+      <div id="coronaplot"></div>
     </div>
   </div>
 
@@ -83,23 +89,71 @@
    </div>
    <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
   </footer>
-
 <script>
-  var dropdown = document.getElementById("dropdown");
+  var dropdown = document.getElementById("dropdown:");
   var mutations = {{mutations_names}};
   var url_string = window.location.href;
   var url = new URL(url_string);
   var language = url.searchParams.get("lang");
   var max_date = url.searchParams.get("max_date");
   var min_date = url.searchParams.get("min_date");
+  var mutation = mutations[0];
+  var mutation_array = mutation.split(':');
+  var previous_gene = mutation_array[0];
+  var gene_button = document.createElement("div");
+  gene_button.className = "w3-bar-item w3-dropdown-click";
+  var gene_button_button = document.createElement("button");
+  gene_button_button.id = previous_gene;
+  gene_button_button.textContent = previous_gene;
+  gene_button_button.className = "w3-button";
+  gene_button_button.onclick = function() {myFunction(this.id)};
+  var gene_button_content = document.createElement("div");
+  gene_button_content.id = previous_gene + ":";
+  gene_button_content.className = "w3-dropdown-content w3-bar-block w3-border";
+  gene_button.appendChild(gene_button_button);
+  gene_button.appendChild(gene_button_content);
+  dropdown.appendChild(gene_button);
   for (var i = 0; i < mutations.length; i++) {
     var mutation = mutations[i];
-    var element = document.createElement("a");
-    element.textContent = mutation;
-    element.className = "w3-bar-item w3-button";
-    element.href = `/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`;
-    dropdown.appendChild(element);
+    var mutation_array = mutation.split(':');
+    var gene = mutation_array[0];
+    var mutation_name = mutation_array[1];
+    if (gene != previous_gene)
+    {
+        var previous_gene = gene;
+        var gene_button = document.createElement("div");
+        gene_button.className = "w3-bar-item w3-dropdown-click";
+        var gene_button_button = document.createElement("button");
+        gene_button_button.id = gene;
+        gene_button_button.textContent = gene;
+        gene_button_button.className = "w3-button";
+        gene_button_button.onclick = function() {myFunction(this.id)};
+        var gene_button_content = document.createElement("div");
+        gene_button_content.id = gene + ":";
+        gene_button_content.className = "w3-dropdown-content w3-bar-block w3-border";
+        gene_button.appendChild(gene_button_button);
+        gene_button.appendChild(gene_button_content);
+        dropdown.appendChild(gene_button);
+
+    }
+    var mutation_button = document.createElement("a");
+    mutation_button.textContent = mutation_name;
+    mutation_button.className = "w3-bar-item w3-button";
+    mutation_button.href = `/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`;
+    gene_button_content.appendChild(mutation_button);
   }
+
+
+  var mutation = url.searchParams.get("mutation");
+
+  fetch(`/plot?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}`)
+      .then(function(response) { return response.json(); })
+      .then(function(item) { return Bokeh.embed.embed_item(item, "coronaplot"); })
+
+  fetch(`/dateRangeSlider?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}`)
+      .then(function(response) { return response.json(); })
+      .then(function(item) { return Bokeh.embed.embed_item(item, "dateRangeSlider"); })
+
 
   function switch_lang() {
     var url_string = window.location.href;
@@ -118,6 +172,8 @@
     }
     window.location.href=(`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
   }
+
+
   function home() {
     var url_string = window.location.href;
     var url = new URL(url_string);
@@ -127,8 +183,9 @@
     window.location.href=(`/?mutation=ALL&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
   }
 
-  function myFunction() {
-  var x = document.getElementById("dropdown");
+
+  function myFunction(id) {
+  var x = document.getElementById(id + ":");
   if (x.className.indexOf("w3-show") == -1) {
     x.className += " w3-show";
   } else {
@@ -136,7 +193,15 @@
   }
   }
 
+  function updateDate(min_date, max_date) {
+    var mutation = url.searchParams.get("mutation");
+    var language = url.searchParams.get("lang");
+    window.location.href=(`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+  }
+
+
 </script>
+
 </body>
 {% endblock %}
 </html>

@@ -8,7 +8,7 @@ from bokeh.models import DateRangeSlider
 from bokeh.resources import CDN
 from database import Database
 from flask import Flask, request, Markup, send_from_directory
-from helpers.plot import create_main_map, create_map
+from helpers.plot import create_main_map, create_map, create_date_range_slider
 from jinja2 import Environment, PackageLoader, Template
 from loguru import logger
 from settings import SERVER_ADDRESS, SERVER_PORT
@@ -39,6 +39,16 @@ def plot():
     return json_item(p, "coronaplot")
 
 
+@app.route("/dateRangeSlider")
+def date_range_slider():
+    mutation = request.args.get("mutation", default="ALL", type=str)
+    language = request.args.get("lang", default="EN", type=str)
+    min_date = request.args.get("min_date", default="2020-01-01", type=str)
+    max_date = request.args.get("max_date", default="2021-02-09", type=str)
+    p = create_date_range_slider(db, mutation, language, min_date, max_date)
+    return json_item(p, "dateRangeSlider")
+
+
 @app.route("/")
 def root():
     mutation = request.args.get("mutation", default="ALL", type=str)
@@ -58,8 +68,10 @@ def root():
     mutation_info = mutation_info[1]
     welcome_text = db.get_text(language, "welcome")
     home_button_text = db.get_text(language, "home_button")
+    update_button_text = db.get_text(language, "update_button")
     mutation_choice_button_text = db.get_text(language, "mutation_choice_button")
     template_variables = {
+        "update_button_text": update_button_text,
         "home_button_text": home_button_text,
         "mutation_choice_button_text": mutation_choice_button_text,
         "mutation": mutation,
