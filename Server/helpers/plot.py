@@ -137,8 +137,7 @@ def create_map(db, mutation_name, lang, min_date, max_date):
     return layout
 
 
-def create_date_range_slider(db, mutation_name, lang, min_date, max_date):
-    update_button_text = db.get_text(lang, "update_button")
+def create_date_range_slider(mutation_name, lang, min_date, max_date):
     mind = [int(i) for i in min_date.split("-")]
     maxd = [int(i) for i in max_date.split("-")]
     date_range_slider = DateRangeSlider(

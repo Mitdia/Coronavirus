@@ -7,8 +7,9 @@ from bokeh.plotting import figure
 from bokeh.models import DateRangeSlider
 from bokeh.resources import CDN
 from database import Database
-from flask import Flask, request, Markup, send_from_directory
+from flask import Flask, request, Markup, send_from_directory, redirect
 from helpers.plot import create_main_map, create_map, create_date_range_slider
+from helpers.security import check_date_format
 from jinja2 import Environment, PackageLoader, Template
 from loguru import logger
 from settings import SERVER_ADDRESS, SERVER_PORT
@@ -45,16 +46,18 @@ def date_range_slider():
     language = request.args.get("lang", default="EN", type=str)
     min_date = request.args.get("min_date", default="2020-01-01", type=str)
     max_date = request.args.get("max_date", default="2021-02-09", type=str)
-    p = create_date_range_slider(db, mutation, language, min_date, max_date)
+    p = create_date_range_slider(mutation, language, min_date, max_date)
     return json_item(p, "dateRangeSlider")
 
 
 @app.route("/")
 def root():
-    mutation = request.args.get("mutation", default="ALL", type=str)
-    language = request.args.get("lang", default="EN", type=str)
-    min_date = request.args.get("min_date", default="2020-01-01", type=str)
-    max_date = request.args.get("max_date", default="2021-02-09", type=str)
+    mutation = request.args.get("mutation", type=str)
+    language = request.args.get("lang", type=str)
+    min_date = request.args.get("min_date", type=str)
+    max_date = request.args.get("max_date", type=str)
+    if mutation == None or language == None or not check_date_format(min_date) or not check_date_format(max_date):
+        return redirect("/?mutation=ALL&lang=EN&min_date=2019-1-1&max_date=2021-12-31")
     lang_sw = "EN"
     mutations_names = db.mutations_names[1:]
     if mutation not in mutations_names:
@@ -62,18 +65,21 @@ def root():
     if language != "RU":
         language = "EN"
         lang_sw = "RU"
-
     mutation_info = db.info_about_mutation(mutation, language)
     mutation_info_header = mutation_info[0]
     mutation_info = mutation_info[1]
     welcome_text = db.get_text(language, "welcome")
     home_button_text = db.get_text(language, "home_button")
-    update_button_text = db.get_text(language, "update_button")
+    update_date_button_text = db.get_text(language, "update_date_button")
+    update_mutation_button_text = db.get_text(language, "update_mutation_button")
     mutation_choice_button_text = db.get_text(language, "mutation_choice_button")
+    gene_choice_button_text = db.get_text(language, "gene_choice_button")
     template_variables = {
-        "update_button_text": update_button_text,
+        "update_date_button_text": update_date_button_text,
+        "update_mutation_button_text": update_mutation_button_text,
         "home_button_text": home_button_text,
         "mutation_choice_button_text": mutation_choice_button_text,
+        "gene_choice_button_text": gene_choice_button_text,
         "mutation": mutation,
         "mutation_info_header": mutation_info_header,
         "mutation_info": mutation_info,
