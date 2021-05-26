@@ -150,6 +150,8 @@ def create_date_range_slider(mutation_name, lang, min_date, max_date):
         "value",
         CustomJS(
             code=f"""
+            var url_string = window.location.href;
+            var url = new URL(url_string);
             var mutation = url.searchParams.get("mutation");
             var language = url.searchParams.get("lang");
             var max_date_previous = url.searchParams.get("max_date");
@@ -167,7 +169,7 @@ def create_date_range_slider(mutation_name, lang, min_date, max_date):
             var updateDateText = document.createElement("p");
             updateDateText.id = "updateDateText";
             updateDateText.textContent = `${{str_min_date}} - ${{str_max_date}}`;
-            updateDate.appendChild(updateDateText)
+            updateDate.appendChild(updateDateText);
             """
         ),
     )
