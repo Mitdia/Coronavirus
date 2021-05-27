@@ -174,3 +174,7 @@ def create_date_range_slider(mutation_name, lang, min_date, max_date):
         ),
     )
     return column(date_range_slider, sizing_mode="scale_width")
+
+
+def create_link_to_outbreak_info(mutation):
+    return (f"https://outbreak.info/situation-reports?muts={mutation}")

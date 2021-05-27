@@ -19,10 +19,10 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <style>
-        html,body,h1,h2,h3,h4,h5,h6 {font-family: "Roboto", sans-serif;}
+        html,body,h1,h2,h3,h4,h5,h6 {font-family: "Garamond", sans-serif;}
         </style>
-        <link rel="stylesheet" href="static/css/style.css">
-        <script src="static/js/script.js"></script>
+        <link rel="stylesheet" href="/static/css/style.css">
+        <script src="/static/js/script.js"></script>
         {{ bokeh_css | indent(8) if bokeh_css }}
         {% endblock %}
 
@@ -88,6 +88,9 @@
     </p>
     <div class="w3-border">
       <div id="coronaplot"></div>
+    </div>
+    <div class=w3-boreder>
+      <a href="{{outbreak_info_link}}" class="further_information">{{further_information_text}}</a>
     </div>
   </div>
 

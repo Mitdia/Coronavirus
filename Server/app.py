@@ -8,7 +8,7 @@ from bokeh.models import DateRangeSlider
 from bokeh.resources import CDN
 from database import Database
 from flask import Flask, request, Markup, send_from_directory, redirect
-from helpers.plot import create_main_map, create_map, create_date_range_slider
+from helpers.plot import create_main_map, create_map, create_date_range_slider, create_link_to_outbreak_info
 from helpers.security import check_date_format
 from jinja2 import Environment, PackageLoader, Template
 from loguru import logger
@@ -69,12 +69,16 @@ def root():
     mutation_info_header = mutation_info[0]
     mutation_info = mutation_info[1]
     welcome_text = db.get_text(language, "welcome")
+    further_information_text = db.get_text(language, "further_information")
     home_button_text = db.get_text(language, "home_button")
     update_date_button_text = db.get_text(language, "update_date_button")
     update_mutation_button_text = db.get_text(language, "update_mutation_button")
     mutation_choice_button_text = db.get_text(language, "mutation_choice_button")
     gene_choice_button_text = db.get_text(language, "gene_choice_button")
+    outbreak_info_link = create_link_to_outbreak_info(mutation)
+
     template_variables = {
+        "outbreak_info_link": outbreak_info_link,
         "update_date_button_text": update_date_button_text,
         "update_mutation_button_text": update_mutation_button_text,
         "home_button_text": home_button_text,
@@ -84,6 +88,7 @@ def root():
         "mutation_info_header": mutation_info_header,
         "mutation_info": mutation_info,
         "welcome_text": welcome_text,
+        "further_information_text": further_information_text,
         "lang": language,
         "lang_sw": lang_sw,
         "mutations_names": mutations_names,

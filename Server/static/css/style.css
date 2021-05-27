@@ -1,17 +1,12 @@
 .welcome_text {
-  color: firebrick;
-  font-size: 2rem;
-  font-family: 'Jost', sans-serif;
+  font-size: 25px;
 }
 
 .info_header_text {
-  color: firebrick;
-  font-size: 2rem;
-  font-family: 'Jost', sans-serif;
+  font-size: 25px;
 }
 
-.info_text {
-  color: firebrick;
-  font-size: 1.2rem;
-  font-family: 'Jost', sans-serif;
+.further_information {
+  text-decoration: none;
+  font-size: 20px;
 }
