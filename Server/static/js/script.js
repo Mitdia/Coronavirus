@@ -22,6 +22,7 @@ function add_gene_dropdown(gene, mutation_dropdown, gene_dropdown) {
 
 function init(mutations) {
   var mutationDropdownButton =  document.getElementById("mutationDropdownButton");
+  var mutationDropdownButtonText =  document.getElementById("mutationDropdownButtonText");
   var gene_dropdown = document.getElementById("gene");
   var mutation_dropdown = document.getElementById("mutation");
   var url_string = window.location.href;
@@ -30,7 +31,10 @@ function init(mutations) {
   var max_date = url.searchParams.get("max_date");
   var min_date = url.searchParams.get("min_date");
   var mutation = url.searchParams.get("mutation");
+
   mutationDropdownButton.onclick = function () {geneDropdown(mutation.split(':')[0])};
+  mutationDropdownButtonText.textContent = mutation.split(':')[0];
+  
   var mutation = mutations[0];
   var mutation_array = mutation.split(':');
   var previous_gene = mutation_array[0];
@@ -102,8 +106,13 @@ function home() {
 function geneDropdown(id) {
   var x = document.getElementById(id + ":");
   current_gene = id;
+
   var mutationDropdownButton =  document.getElementById("mutationDropdownButton");
+  var mutationDropdownButtonText =  document.getElementById("mutationDropdownButtonText");
+
   mutationDropdownButton.onclick = function () {geneDropdown(current_gene)};
+  mutationDropdownButtonText.textContent = current_gene;
+
   if (x.className.indexOf("w3-show") == -1) {
     x.className += " w3-show";
   } else {

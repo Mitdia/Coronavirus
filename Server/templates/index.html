@@ -53,20 +53,19 @@
 
   <div class="w3-row w3-margin w3-padding">
     <div class="w3-row w3-green">
-      <div class="w3-container w3-padding w3-green w3-dropdown-click w3-col l1 m2 s3">
+      <div class="w3-container w3-padding w3-green w3-dropdown-click w3-col l5 m4">
         <button onclick="mainDropdown()" class="w3-button w3-black" style="min-width: 100%">
-          {{gene_choice_button_text}}
+          <p style="display:inline;">{{gene_choice_button_text}}</p>
         </button>
         <div id="gene" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
       </div>
-      <div class="w3-container w3-col l1 m1 s1"></div>
-      <div class="w3-container w3-padding w3-green w3-dropdown-click w3-col l1 m2 s3" id="mutation">
+      <div class="w3-container w3-padding w3-green w3-dropdown-click w3-col l5 m4" id="mutation">
         <button class="w3-button w3-black" id="mutationDropdownButton" style="min-width: 100%">
-          {{mutation_choice_button_text}}
+          <p style="display:inline;">{{mutation_choice_button_text}}</p>
+          <p style="display:inline;" id="mutationDropdownButtonText"></p>
         </button>
       </div>
-      <div class="w3-container w3-green w3-padding w3-col l7 m3 s2"></div>
-      <div onclick="updateMutation('{{mutation}}')" class="w3-button w3-col l2 m4 s3" id="updateMutation">
+      <div onclick="updateMutation('{{mutation}}')" class="w3-button w3-col l2 m4" id="updateMutation">
         <p>{{update_mutation_button_text}}:</p>
         <p class="w3-strong" id="updateMutationText">
           {{mutation}}
@@ -74,10 +73,10 @@
       </div>
     </div>
     <div class="w3-row w3-green">
-      <div class="w3-container w3-padding-24 w3-col l10 m9 s8">
+      <div class="w3-container w3-padding-24 w3-col l10 m9">
         <div id="dateRangeSlider"></div>
       </div>
-      <div onclick="updateDate('{{min_date}}', '{{max_date}}')" class="w3-green w3-button w3-col l2 m3 s4" id="updateDate">
+      <div onclick="updateDate('{{min_date}}', '{{max_date}}')" class="w3-green w3-button w3-col l2 m3" id="updateDate">
         <p>{{update_date_button_text}}:</p>
         <p class="w3-strong" id="updateDateText">
           {{min_date}} - {{max_date}}
