@@ -22,6 +22,7 @@ function add_gene_dropdown(gene, mutation_dropdown, gene_dropdown) {
 
 function init(mutations) {
   var mutationDropdownButton =  document.getElementById("mutationDropdownButton");
+  var geneDropdownButtonText = document.getElementById("geneDropdownButtonText");
   var mutationDropdownButtonText =  document.getElementById("mutationDropdownButtonText");
   var gene_dropdown = document.getElementById("gene");
   var mutation_dropdown = document.getElementById("mutation");
@@ -32,14 +33,18 @@ function init(mutations) {
   var min_date = url.searchParams.get("min_date");
   var mutation = url.searchParams.get("mutation");
 
+
   mutationDropdownButton.onclick = function () {geneDropdown(mutation.split(':')[0])};
+  geneDropdownButtonText.textContent = mutation.split(':')[0];
   mutationDropdownButtonText.textContent = mutation.split(':')[0];
-  
+
   var mutation = mutations[0];
   var mutation_array = mutation.split(':');
   var previous_gene = mutation_array[0];
   gene_button_content = add_gene_dropdown(previous_gene, mutation_dropdown, gene_dropdown);
+
   genes_array.push(previous_gene);
+
   for (var i = 0; i < mutations.length; i++) {
     var mutation = mutations[i];
     var mutation_array = mutation.split(':');
@@ -109,13 +114,21 @@ function geneDropdown(id) {
 
   var mutationDropdownButton =  document.getElementById("mutationDropdownButton");
   var mutationDropdownButtonText =  document.getElementById("mutationDropdownButtonText");
+  var geneDropdownButtonText = document.getElementById("geneDropdownButtonText");
+  var mutationNameDropdownButtonText =  document.getElementById("mutationNameDropdownButtonText");
 
   mutationDropdownButton.onclick = function () {geneDropdown(current_gene)};
-  mutationDropdownButtonText.textContent = current_gene;
+  mutationDropdownButtonText.textContent = current_gene + ':';
+  geneDropdownButtonText.textContent = current_gene;
+  mutationNameDropdownButtonText.textContent = '';
 
   if (x.className.indexOf("w3-show") == -1) {
     x.className += " w3-show";
   } else {
+    x.className = x.className.replace(" w3-show", "");
+  }
+  var x = document.getElementById("gene");
+  if (x.className.indexOf("w3-show") != -1) {
     x.className = x.className.replace(" w3-show", "");
   }
   for (var i = 0; i < genes_array.length; i++)
@@ -146,15 +159,28 @@ function mainDropdown() {
 
 
 function changeUpdateMutation(mutation) {
+  var x = document.getElementById("gene");
+  if (x.className.indexOf("w3-show") != -1) {
+    x.className = x.className.replace(" w3-show", "");
+  }
+  for (var i = 0; i < genes_array.length; i++)
+  {
+    var x = document.getElementById(genes_array[i] + ":");
+    if (x.className.indexOf("w3-show") != -1) {
+      x.className = x.className.replace(" w3-show", "");
+    }
+  }
   var url_string = window.location.href;
   var url = new URL(url_string);
   var max_date = url.searchParams.get("max_date");
   var min_date = url.searchParams.get("min_date");
   var language = url.searchParams.get("lang");
   var updateMutationButton = document.getElementById("updateMutation");
+  var mutationNameDropdownButtonText =  document.getElementById("mutationNameDropdownButtonText");
   var updateMutationText = document.getElementById("updateMutationText");
   updateMutationButton.onclick = function () {window.location.href=(`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);}
   updateMutationText.textContent = mutation;
+  mutationNameDropdownButtonText.textContent = mutation.split(':')[1];
 }
 
 
@@ -167,10 +193,17 @@ function updateMutation(mutation) {
   window.location.href=(`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
 }
 
+
 function updateDate(min_date, max_date) {
   var url_string = window.location.href;
   var url = new URL(url_string);
   var mutation = url.searchParams.get("mutation");
   var language = url.searchParams.get("lang");
   window.location.href=(`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+}
+
+
+function outbreakInfoLink(outbreak_link) {
+  console.log(outbreakInfoLink);
+  window.location.href=(outbreak_link);
 }
