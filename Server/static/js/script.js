@@ -1,5 +1,11 @@
 var genes_array = [];
 var current_gene = "";
+var url_string = window.location.href;
+var url = new URL(url_string);
+var max_date = url.searchParams.get("max_date");
+var min_date = url.searchParams.get("min_date");
+var language = url.searchParams.get("lang");
+var mutation = url.searchParams.get("mutation");
 
 function add_gene_dropdown(gene, mutation_dropdown, gene_dropdown) {
   var gene_button = document.createElement("div");
@@ -24,29 +30,26 @@ function init(mutations) {
   var mutationDropdownButton =  document.getElementById("mutationDropdownButton");
   var geneDropdownButtonText = document.getElementById("geneDropdownButtonText");
   var mutationDropdownButtonText =  document.getElementById("mutationDropdownButtonText");
+  var mutationNameDropdownButtonText =  document.getElementById("mutationNameDropdownButtonText");
   var gene_dropdown = document.getElementById("gene");
   var mutation_dropdown = document.getElementById("mutation");
-  var url_string = window.location.href;
-  var url = new URL(url_string);
-  var language = url.searchParams.get("lang");
-  var max_date = url.searchParams.get("max_date");
-  var min_date = url.searchParams.get("min_date");
-  var mutation = url.searchParams.get("mutation");
 
 
-  mutationDropdownButton.onclick = function () {geneDropdown(mutation.split(':')[0])};
-  geneDropdownButtonText.textContent = mutation.split(':')[0];
-  mutationDropdownButtonText.textContent = mutation.split(':')[0];
-
-  var mutation = mutations[0];
   var mutation_array = mutation.split(':');
+  mutationDropdownButton.onclick = function () {geneDropdown(mutation_array[0])};
+  geneDropdownButtonText.textContent = mutation_array[0];
+  mutationDropdownButtonText.textContent = mutation_array[0] + ':';
+  mutationNameDropdownButtonText.textContent = mutation_array[1];
+
+  mutation = mutations[0];
+  mutation_array = mutation.split(':');
   var previous_gene = mutation_array[0];
   gene_button_content = add_gene_dropdown(previous_gene, mutation_dropdown, gene_dropdown);
 
   genes_array.push(previous_gene);
 
   for (var i = 0; i < mutations.length; i++) {
-    var mutation = mutations[i];
+    mutation = mutations[i];
     var mutation_array = mutation.split(':');
     var gene = mutation_array[0];
     var mutation_name = mutation_array[1];
@@ -60,13 +63,13 @@ function init(mutations) {
     mutation_button.textContent = mutation_name;
     mutation_button.className = "w3-bar-item w3-button";
     mutation_button.id = mutation;
-    mutation_button.onclick = function () {changeUpdateMutation(this.id)};
+    mutation_button.onclick = function () {changeupdate(this.id)};
     gene_button_content.appendChild(mutation_button);
   }
 
   var previous_dropdown = "None";
 
-  var mutation = url.searchParams.get("mutation");
+  mutation = url.searchParams.get("mutation");
 
   fetch(`/plot?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}`)
       .then(function(response) { return response.json(); })
@@ -80,12 +83,6 @@ function init(mutations) {
 
 
 function switch_lang() {
-  var url_string = window.location.href;
-  var url = new URL(url_string);
-  var mutation = url.searchParams.get("mutation");
-  var language = url.searchParams.get("lang");
-  var max_date = url.searchParams.get("max_date");
-  var min_date = url.searchParams.get("min_date");
   if (language == "EN")
   {
     language = "RU";
@@ -99,11 +96,6 @@ function switch_lang() {
 
 
 function home() {
-  var url_string = window.location.href;
-  var url = new URL(url_string);
-  var language = url.searchParams.get("lang");
-  var max_date = url.searchParams.get("max_date");
-  var min_date = url.searchParams.get("min_date");
   window.location.href=(`/?mutation=ALL&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
 }
 
@@ -158,7 +150,7 @@ function mainDropdown() {
 }
 
 
-function changeUpdateMutation(mutation) {
+function changeupdate(new_mutation) {
   var x = document.getElementById("gene");
   if (x.className.indexOf("w3-show") != -1) {
     x.className = x.className.replace(" w3-show", "");
@@ -170,36 +162,21 @@ function changeUpdateMutation(mutation) {
       x.className = x.className.replace(" w3-show", "");
     }
   }
-  var url_string = window.location.href;
-  var url = new URL(url_string);
-  var max_date = url.searchParams.get("max_date");
-  var min_date = url.searchParams.get("min_date");
-  var language = url.searchParams.get("lang");
-  var updateMutationButton = document.getElementById("updateMutation");
+  mutation = new_mutation;
+  var updateButton = document.getElementById("update");
   var mutationNameDropdownButtonText =  document.getElementById("mutationNameDropdownButtonText");
-  var updateMutationText = document.getElementById("updateMutationText");
-  updateMutationButton.onclick = function () {window.location.href=(`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);}
-  updateMutationText.textContent = mutation;
+  updateButton.onclick = function () {window.location.href=(`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);}
   mutationNameDropdownButtonText.textContent = mutation.split(':')[1];
 }
 
 
-function updateMutation(mutation) {
-  var url_string = window.location.href;
-  var url = new URL(url_string);
-  var max_date = url.searchParams.get("max_date");
-  var min_date = url.searchParams.get("min_date");
-  var language = url.searchParams.get("lang");
-  window.location.href=(`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
-}
-
-
-function updateDate(min_date, max_date) {
-  var url_string = window.location.href;
-  var url = new URL(url_string);
-  var mutation = url.searchParams.get("mutation");
-  var language = url.searchParams.get("lang");
-  window.location.href=(`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+function dateRangeSlider(min_timestamp, max_timestamp) {
+  var update = document.getElementById("update");
+  min_date = new Date(min_timestamp);
+  min_date = min_date.getFullYear() + "-" + (min_date.getMonth() + 1) + "-" + min_date.getDate();
+  max_date = new Date(max_timestamp);
+  max_date = max_date.getFullYear() + "-" + (max_date.getMonth() + 1) + "-" + max_date.getDate();
+  update.onclick = function() {window.location.href=(`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);};
 }
 
 

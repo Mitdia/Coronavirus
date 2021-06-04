@@ -2,7 +2,7 @@ from math import log2, pi
 
 from functools import lru_cache
 from bokeh.layouts import column, row
-from bokeh.models import Paragraph, Select, Button, CustomJS, DateRangeSlider
+from bokeh.models import Paragraph, Select, Button, CustomJS, DateRangeSlider, Range1d
 from bokeh.models.tools import HoverTool, PanTool, ResetTool, WheelZoomTool
 from bokeh.plotting import figure
 from datetime import date
@@ -28,6 +28,8 @@ def configure_plot():
         toolbar_location=None,
         sizing_mode="scale_width",
     )
+    p.x_range = Range1d(0, PLT_WIDTH, bounds="auto")
+    p.y_range = Range1d(0, PLT_HEIGHT, bounds="auto")
     p.grid.visible = False
     p.axis.visible = False
     p.outline_line_width = 0
@@ -149,28 +151,7 @@ def create_date_range_slider(mutation_name, lang, min_date, max_date):
     date_range_slider.js_on_change(
         "value",
         CustomJS(
-            code=f"""
-            var url_string = window.location.href;
-            var url = new URL(url_string);
-            var mutation = url.searchParams.get("mutation");
-            var language = url.searchParams.get("lang");
-            var max_date_previous = url.searchParams.get("max_date");
-            var min_date_previous = url.searchParams.get("min_date");
-            var updateDate = document.getElementById("updateDate");
-            var min_timestamp = this.value[0];
-            var max_timestamp = this.value[1];
-            var min_date = new Date(min_timestamp);
-            var str_min_date = min_date.getFullYear() + "-" + (min_date.getMonth() + 1) + "-" + min_date.getDate();
-            var max_date = new Date(max_timestamp);
-            var str_max_date = max_date.getFullYear() + "-" + (max_date.getMonth() + 1) + "-" + max_date.getDate();
-            updateDate.onclick = function() {{window.location.href=(`/?mutation=${{mutation}}&lang=${{language}}&min_date=${{str_min_date}}&max_date=${{str_max_date}}`);}};
-            var updateDateText = document.getElementById("updateDateText");
-            updateDate.removeChild(updateDateText)
-            var updateDateText = document.createElement("p");
-            updateDateText.id = "updateDateText";
-            updateDateText.textContent = `${{str_min_date}} - ${{str_max_date}}`;
-            updateDate.appendChild(updateDateText);
-            """
+            code="dateRangeSlider(this.value[0], this.value[1])"
         ),
     )
     return column(date_range_slider, sizing_mode="scale_width")
