@@ -2,6 +2,7 @@ import sqlite3
 from functools import lru_cache
 from pathlib import Path
 
+from datetime import datetime
 import pandas as pd
 from flask import _app_ctx_stack, current_app
 from loguru import logger
@@ -15,8 +16,8 @@ class Database(object):
 
     def __init__(self, app=None):
         self.app = app
-        self.min_date = "2020-01-01 00:00:00"
-        self.max_date = "2021-02-09 00:00:00"
+        self.min_date = "2019-01-01 00:00:00"
+        self.max_date = "2021-12-31 00:00:00"
 
     @lru_cache()
     def regions(self, language="EN"):
@@ -58,6 +59,9 @@ class Database(object):
             first_date = self.min_date
         if last_date == "default":
             last_date = self.max_date
+        format = "%Y-%m-%d"
+        first_date = datetime.strptime(first_date, format)
+        last_date = datetime.strptime(last_date, format)
         result = db.execute(
             f"""SELECT COUNT(*) FROM samples_data
                             WHERE (Location_RU = \"{region}\"

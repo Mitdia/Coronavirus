@@ -13,7 +13,7 @@ def translate_regions_names(region_name):
 
 
 def parse_data(
-    regions, adress=Path("Data", "RussianSamples.Mutations.UpTo28thFeb.txt")
+    regions, adress=Path("Data", "RussianSamples.GISAID.20210604.csv")
 ):
     main_data = open(adress, "r", encoding="utf-8")
     data = pd.read_csv(main_data, sep="\t", header=None)
@@ -46,7 +46,7 @@ def parse_data(
                 mutations_names.append(mutation_name)
     mutations_names.sort()
     data = data.rename(
-        columns={0: "sample name", 1: "date", 2: "Location_EN", 3: "mutations"}
+        columns={0: "sample name", 1:  "Location_EN", 2: "date", 3: "mutations"}
     )
     data["Location_RU"] = data["Location_EN"]
     for region in regions:
@@ -59,8 +59,11 @@ def parse_data(
         {}, columns=["Mutation", "Location_RU", "Location_EN", "Date", "Sample_ID"]
     )
     pandas_index = 0
-
+    previous_index = -1
     for index, row in data.iterrows():
+        if index >= previous_index + 100:
+            print(index)
+            previous_index = index
         location = row["Location_EN"]
         date = row["date"]
         for mutation in row["mutations"].split(",")[:-1]:
@@ -177,6 +180,7 @@ blocked = [
 ]
 
 genes = [
+    "lineage",
     "leader",
     "nsp2",
     "nsp3",
