@@ -12,9 +12,7 @@ def translate_regions_names(region_name):
             return regions_names[0]
 
 
-def parse_data(
-    regions, adress=Path("Data", "RussianSamples.GISAID.20210604.csv")
-):
+def parse_data(regions, adress=Path("Data", "RussianSamples.GISAID.20210604.csv")):
     main_data = open(adress, "r", encoding="utf-8")
     data = pd.read_csv(main_data, sep="\t", header=None)
     dbase = sqlite3.connect("samples_data.sqlite")
@@ -48,7 +46,7 @@ def parse_data(
                 mutations_names.append(mutation_name)
     mutations_names.sort()
     data = data.rename(
-        columns={0: "sample name", 1:  "Location_EN", 2: "date", 3: "mutations"}
+        columns={0: "sample name", 1: "Location_EN", 2: "date", 3: "mutations"}
     )
     data["Location_RU"] = data["Location_EN"]
     for region in regions:
@@ -83,7 +81,6 @@ def parse_data(
                   \"Size of the blue circle logarithmically depends on number of samples, recieved from this region.\");
                   """
     )
-
 
     for mutation in mutations_names:
 

@@ -8,7 +8,12 @@ from bokeh.models import DateRangeSlider
 from bokeh.resources import CDN
 from database import Database
 from flask import Flask, request, Markup, send_from_directory, redirect
-from helpers.plot import create_main_map, create_map, create_date_range_slider, create_link_to_outbreak_info
+from helpers.plot import (
+    create_main_map,
+    create_map,
+    create_date_range_slider,
+    create_link_to_outbreak_info,
+)
 from helpers.security import check_date_format
 from jinja2 import Environment, PackageLoader, Template
 from loguru import logger
@@ -56,7 +61,12 @@ def root():
     language = request.args.get("lang", type=str)
     min_date = request.args.get("min_date", type=str)
     max_date = request.args.get("max_date", type=str)
-    if mutation == None or language == None or not check_date_format(min_date) or not check_date_format(max_date):
+    if (
+        mutation == None
+        or language == None
+        or not check_date_format(min_date)
+        or not check_date_format(max_date)
+    ):
         return redirect(f"/?mutation=ALL&lang=EN&min_date=2019-1-1&max_date={today}")
     lang_sw = "EN"
     mutations_names = db.mutations_names[1:]
