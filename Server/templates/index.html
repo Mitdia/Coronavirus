@@ -37,7 +37,7 @@
 {% block body %}
 
 <body>
-  <header class="w3-bar w3-green">
+  <header class="w3-bar w3-light-green">
 	<img src="static/img/logo.png" class="w3-image w3-margin" width="100" height="100">
 	<span class="welcome_text">taxameter.ru</span>
 	<span onclick="switch_lang()" class="w3-right w3-button">{{lang_sw}}</span>
@@ -51,17 +51,17 @@
     <p class="w3-strong info_header_text">
       {{mutation_info_header}}
     </p>
-    <div class="w3-row w3-green w3-col l3 m3">
-        <div onclick="home()" class="w3-right w3-button w3-col">{{home_button_text}}</div>
-        <div class="w3-container w3-padding w3-green w3-dropdown-click w3-col">
-          <button onclick="mainDropdown()" class="w3-button w3-black" style="min-width: 100%">
+    <div class="w3-row w3-light-green w3-col l3 m3">
+        <div onclick="home()" class="w3-margin w3-btn w3-col w3-black my-btn">{{home_button_text}}</div>
+        <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
+          <button onclick="mainDropdown()" class="w3-btn w3-black my-btn" style="min-width: 100%">
             <p style="display:inline;">{{gene_choice_button_text}}</p>
             <p style="display:inline;" id="geneDropdownButtonText"></p>
           </button>
           <div id="gene" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
         </div>
-        <div class="w3-container w3-padding w3-green w3-dropdown-click w3-col" id="mutation">
-          <button class="w3-btn w3-black" id="mutationDropdownButton" style="min-width: 100%">
+        <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col" id="mutation">
+          <button class="w3-btn w3-black w3-black my-btn" id="mutationDropdownButton" style="min-width: 100%">
             <p style="display:inline;">{{mutation_choice_button_text}}</p>
             <p style="display:inline;" id="mutationDropdownButtonText"></p>
             <p style="display:inline;" id="mutationNameDropdownButtonText"></p>
@@ -70,15 +70,15 @@
         <div class="w3-container w3-padding-24 w3-col">
           <div id="dateRangeSlider"></div>
         </div>
-        <div class="w3-border w3-col w3-green w3-button" id="update">
+        <div class="w3-border w3-margin w3-col w3-btn w3-black my-btn" id="update">
           <p>{{update_button_text}}</p>
         </div>
-      	<div onclick="outbreakInfoLink('{{outbreak_info_link}}')" class="w3-green w3-button w3-col further_information" id="updateDate">
-                <p style="display:inline;">{{further_information_text}} {{mutation}}</p>
+      	<div onclick="outbreakInfoLink('{{outbreak_info_link}}')" class="w3-margin w3-btn w3-col further_information w3-black my-btn" id="updateDate">
+          <p style="display:inline;">{{further_information_text}} {{mutation}}</p>
         </div>
       </div>
 <!--
-	<div class="further_information w3-green w3-button w3-col" onclick="outbreakInfoLink('{{outbreak_info_link}}')">
+	<div class="further_information w3-light-green w3-button w3-col" onclick="outbreakInfoLink('{{outbreak_info_link}}')">
 	    {{further_information_text}} {{mutation}}
         </div>
 

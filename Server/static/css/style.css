@@ -10,3 +10,7 @@
     white-space: normal;
     font-size: medium;
 }
+
+.my-btn {
+    max-width: 90%;
+}
