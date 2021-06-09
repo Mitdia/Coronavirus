@@ -36,7 +36,7 @@ function init(mutations) {
 
 
   var mutation_array = mutation.split(':');
-  mutationDropdownButton.onclick = function () {geneDropdown(mutation_array[0])};
+  mutationDropdownButton.onclick = function () {geneDropdown(mutation.split(':')[0])};
   geneDropdownButtonText.textContent = mutation_array[0];
   mutationDropdownButtonText.textContent = mutation_array[0] + ':';
   mutationNameDropdownButtonText.textContent = mutation_array[1];
@@ -50,7 +50,7 @@ function init(mutations) {
 
   for (var i = 0; i < mutations.length; i++) {
     mutation = mutations[i];
-    var mutation_array = mutation.split(':');
+    mutation_array = mutation.split(':');
     var gene = mutation_array[0];
     var mutation_name = mutation_array[1];
     if (gene != previous_gene)

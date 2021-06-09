@@ -17,6 +17,7 @@ def parse_data(
 ):
     main_data = open(adress, "r", encoding="utf-8")
     data = pd.read_csv(main_data, sep="\t", header=None)
+    dbase = sqlite3.connect("samples_data.sqlite")
 
     mutations_names = []
     for mutations in data[3]:
@@ -24,8 +25,9 @@ def parse_data(
             if mutation_name_raw == "":
                 continue
             mutation_name = [0, 0, "", "", ""]
-            mutation_name[4], mutation_name[1] = mutation_name_raw.split(":")
-            mutation_name[0] = genes.index(mutation_name[4])
+            mutation_name[4] = mutation_name_raw
+            mutation_name[0], mutation_name[1] = mutation_name_raw.split(":")
+            mutation_name[0] = genes.index(mutation_name[0])
 
             rodata = mutation_name[1][1:]
             number = 0
@@ -58,29 +60,7 @@ def parse_data(
     mutation_data = pd.DataFrame(
         {}, columns=["Mutation", "Location_RU", "Location_EN", "Date", "Sample_ID"]
     )
-    pandas_index = 0
-    previous_index = -1
-    for index, row in data.iterrows():
-        if index >= previous_index + 100:
-            print(index)
-            previous_index = index
-        location = row["Location_EN"]
-        date = row["date"]
-        for mutation in row["mutations"].split(",")[:-1]:
-            if mutation != " ":
 
-                mutation_data.loc[pandas_index] = [
-                    mutation,
-                    translate_regions_names(location),
-                    location,
-                    date,
-                    index,
-                ]
-                pandas_index += 1
-
-    dbase = sqlite3.connect("samples_data.sqlite")
-    mutation_data.to_sql("data_about_mutations", dbase, if_exists="replace")
-    data.to_sql("samples_data", dbase, if_exists="replace")
     dbase.execute("""DROP TABLE IF EXISTS 'mutations';""")
     dbase.execute(
         """CREATE TABLE mutations (
@@ -104,8 +84,11 @@ def parse_data(
                   """
     )
 
+
     for mutation in mutations_names:
-        mutation = mutation[4] + ":" + mutation[2] + str(mutation[1]) + mutation[3]
+
+        mutation = mutation[4]
+        print(mutation, end=" ")
         dbase.execute(
             f"""INSERT INTO mutations
                          (mutation_name, RU_header, EN_header, RU_info, EN_info)
@@ -117,6 +100,32 @@ def parse_data(
                           \"There is no information about this mutation.\");
                           """
         )
+
+    dbase.commit()
+
+    pandas_index = 0
+    previous_index = -1
+
+    for index, row in data.iterrows():
+        if index >= previous_index + 100:
+            print(index)
+            previous_index = index
+        location = row["Location_EN"]
+        date = row["date"]
+        for mutation in row["mutations"].split(","):
+            if mutation != " ":
+
+                mutation_data.loc[pandas_index] = [
+                    mutation,
+                    translate_regions_names(location),
+                    location,
+                    date,
+                    index,
+                ]
+                pandas_index += 1
+
+    mutation_data.to_sql("data_about_mutations", dbase, if_exists="replace")
+    data.to_sql("samples_data", dbase, if_exists="replace")
     dbase.commit()
     dbase.close()
     return mutations_names

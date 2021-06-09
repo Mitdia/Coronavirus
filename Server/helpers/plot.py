@@ -5,7 +5,7 @@ from bokeh.layouts import column, row
 from bokeh.models import Paragraph, Select, Button, CustomJS, DateRangeSlider, Range1d
 from bokeh.models.tools import HoverTool, PanTool, ResetTool, WheelZoomTool
 from bokeh.plotting import figure
-from datetime import date
+from datetime import date, datetime
 from settings import PLT_HEIGHT, PLT_WIDTH
 
 
@@ -145,7 +145,7 @@ def create_date_range_slider(mutation_name, lang, min_date, max_date):
     date_range_slider = DateRangeSlider(
         value=(date(mind[0], mind[1], mind[2]), date(maxd[0], maxd[1], maxd[2])),
         start=date(2019, 1, 1),
-        end=date(2021, 12, 31),
+        end=datetime.today().strftime("%Y-%m-%d"),
         width_policy="max",
     )
     date_range_slider.js_on_change(
@@ -158,4 +158,7 @@ def create_date_range_slider(mutation_name, lang, min_date, max_date):
 
 
 def create_link_to_outbreak_info(mutation):
+    mutation_array = mutation.split(":")
+    if mutation_array[0] == "leneage":
+            return (f"https://outbreak.info/situation-reports?pango={mutation_array[1]}")
     return (f"https://outbreak.info/situation-reports?muts={mutation}")

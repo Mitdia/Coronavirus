@@ -1,7 +1,7 @@
 import sys
 from functools import lru_cache
 from pathlib import Path
-from datetime import date
+from datetime import date, datetime
 from bokeh.embed import file_html, json_item
 from bokeh.plotting import figure
 from bokeh.models import DateRangeSlider
@@ -13,7 +13,6 @@ from helpers.security import check_date_format
 from jinja2 import Environment, PackageLoader, Template
 from loguru import logger
 from settings import SERVER_ADDRESS, SERVER_PORT
-from datetime import datetime
 
 app = Flask(__name__)
 db = Database(app)
@@ -52,12 +51,13 @@ def date_range_slider():
 
 @app.route("/")
 def root():
+    today = datetime.today().strftime("%Y-%m-%d")
     mutation = request.args.get("mutation", type=str)
     language = request.args.get("lang", type=str)
     min_date = request.args.get("min_date", type=str)
     max_date = request.args.get("max_date", type=str)
     if mutation == None or language == None or not check_date_format(min_date) or not check_date_format(max_date):
-        return redirect("/?mutation=ALL&lang=EN&min_date=2019-1-1&max_date=2021-12-31")
+        return redirect(f"/?mutation=ALL&lang=EN&min_date=2019-1-1&max_date={today}")
     lang_sw = "EN"
     mutations_names = db.mutations_names[1:]
     if mutation not in mutations_names:

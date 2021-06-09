@@ -16,8 +16,9 @@ class Database(object):
 
     def __init__(self, app=None):
         self.app = app
+        today = datetime.today().strftime("%Y-%m-%d")
         self.min_date = "2019-01-01 00:00:00"
-        self.max_date = "2021-12-31 00:00:00"
+        self.max_date = f"{today} 00:00:00"
 
     @lru_cache()
     def regions(self, language="EN"):
