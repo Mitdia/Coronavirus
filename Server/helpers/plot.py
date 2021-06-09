@@ -159,6 +159,6 @@ def create_date_range_slider(mutation_name, lang, min_date, max_date):
 
 def create_link_to_outbreak_info(mutation):
     mutation_array = mutation.split(":")
-    if mutation_array[0] == "leneage":
+    if mutation_array[0] == "lineage":
             return (f"https://outbreak.info/situation-reports?pango={mutation_array[1]}")
     return (f"https://outbreak.info/situation-reports?muts={mutation}")
