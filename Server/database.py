@@ -17,7 +17,7 @@ class Database(object):
     def __init__(self, app=None):
         self.app = app
         today = datetime.today().strftime("%Y-%m-%d")
-        self.min_date = "2019-01-01 00:00:00"
+        self.min_date = "2020-02-01 00:00:00"
         self.max_date = f"{today} 00:00:00"
 
     @lru_cache()
@@ -84,6 +84,9 @@ class Database(object):
             first_date = self.min_date
         if last_date == "default":
             last_date = self.max_date
+        format = "%Y-%m-%d"
+        first_date = datetime.strptime(first_date, format)
+        last_date = datetime.strptime(last_date, format)
         result = db.execute(
             f"""SELECT COUNT(*) FROM data_about_mutations
                             WHERE Mutation = \"{mutation}\"

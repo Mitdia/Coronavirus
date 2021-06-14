@@ -144,7 +144,7 @@ def create_date_range_slider(mutation_name, lang, min_date, max_date):
     maxd = [int(i) for i in max_date.split("-")]
     date_range_slider = DateRangeSlider(
         value=(date(mind[0], mind[1], mind[2]), date(maxd[0], maxd[1], maxd[2])),
-        start=date(2019, 1, 1),
+        start=date(2020, 2, 1),
         end=datetime.today().strftime("%Y-%m-%d"),
         width_policy="max",
     )

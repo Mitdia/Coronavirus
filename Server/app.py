@@ -35,7 +35,7 @@ logger.add(
 def plot():
     mutation = request.args.get("mutation", default="ALL", type=str)
     language = request.args.get("lang", default="EN", type=str)
-    min_date = request.args.get("min_date", default="2020-01-01", type=str)
+    min_date = request.args.get("min_date", default="2020-02-01", type=str)
     max_date = request.args.get("max_date", default="2021-02-09", type=str)
     if mutation == "ALL":
         p = create_main_map(db, language, min_date, max_date)
@@ -67,7 +67,7 @@ def root():
         or not check_date_format(min_date)
         or not check_date_format(max_date)
     ):
-        return redirect(f"/?mutation=ALL&lang=EN&min_date=2019-1-1&max_date={today}")
+        return redirect(f"/?mutation=ALL&lang=EN&min_date=2020-2-9&max_date={today}")
     lang_sw = "EN"
     mutations_names = db.mutations_names[1:]
     if mutation not in mutations_names:
@@ -125,6 +125,5 @@ if __name__ == "__main__":
     app.run(
         host=SERVER_ADDRESS,
         port=SERVER_PORT,
-        # debug=False,
-        debug=True,
+        debug=False,
     )
