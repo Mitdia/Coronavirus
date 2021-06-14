@@ -84,6 +84,8 @@ def root():
     update_button_text = db.get_text(language, "update_button")
     mutation_choice_button_text = db.get_text(language, "mutation_choice_button")
     gene_choice_button_text = db.get_text(language, "gene_choice_button")
+    variables_text = db.get_text(language, "variables")
+    date_slider_text = db.get_text(language, "date_slider")
     outbreak_info_link = create_link_to_outbreak_info(mutation)
 
     template_variables = {
@@ -91,6 +93,8 @@ def root():
         "update_button_text": update_button_text,
         "home_button_text": home_button_text,
         "mutation_choice_button_text": mutation_choice_button_text,
+        "variables_text": variables_text,
+        "date_slider_text": date_slider_text,
         "gene_choice_button_text": gene_choice_button_text,
         "mutation": mutation,
         "mutation_info_header": mutation_info_header,
