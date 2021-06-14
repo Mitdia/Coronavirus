@@ -150,15 +150,13 @@ def create_date_range_slider(mutation_name, lang, min_date, max_date):
     )
     date_range_slider.js_on_change(
         "value",
-        CustomJS(
-            code="dateRangeSlider(this.value[0], this.value[1])"
-        ),
+        CustomJS(code="dateRangeSlider(this.value[0], this.value[1])"),
     )
     return column(date_range_slider, sizing_mode="scale_width")
 
 
 def create_link_to_outbreak_info(mutation):
     mutation_array = mutation.split(":")
-    if mutation_array[0] == "leneage":
-            return (f"https://outbreak.info/situation-reports?pango={mutation_array[1]}")
-    return (f"https://outbreak.info/situation-reports?muts={mutation}")
+    if mutation_array[0] == "lineage":
+        return f"https://outbreak.info/situation-reports?pango={mutation_array[1]}"
+    return f"https://outbreak.info/situation-reports?muts={mutation}"
