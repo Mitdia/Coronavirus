@@ -123,6 +123,18 @@ class Database(object):
         db.close()
         return [result[0][0], result[0][1]]
 
+    @property
+    @lru_cache()
+    def text_names(self):
+        db = sqlite3.connect(Path("samples_data.sqlite"))
+        result = db.execute(f"SELECT text_name FROM information_text").fetchall()
+        text_names = []
+        for text in result:
+            text_names.append(text[0])
+        db.close()
+        return text_names
+
+
     @lru_cache()
     def get_text(self, lang, text_name):
         db = sqlite3.connect(Path("samples_data.sqlite"))

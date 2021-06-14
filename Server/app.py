@@ -78,38 +78,23 @@ def root():
     mutation_info = db.info_about_mutation(mutation, language)
     mutation_info_header = mutation_info[0]
     mutation_info = mutation_info[1]
-    welcome_text = db.get_text(language, "welcome")
-    further_information_text = db.get_text(language, "further_information")
-    home_button_text = db.get_text(language, "home_button")
-    update_button_text = db.get_text(language, "update_button")
-    mutation_choice_button_text = db.get_text(language, "mutation_choice_button")
-    gene_choice_button_text = db.get_text(language, "gene_choice_button")
-    variables_text = db.get_text(language, "variables")
-    example_text = db.get_text(language, "example")
-    date_slider_text = db.get_text(language, "date_slider")
+    text_names = db.text_names
     outbreak_info_link = create_link_to_outbreak_info(mutation)
-
     template_variables = {
         "outbreak_info_link": outbreak_info_link,
-        "update_button_text": update_button_text,
-        "home_button_text": home_button_text,
-        "mutation_choice_button_text": mutation_choice_button_text,
-        "variables_text": variables_text,
-        "example_text": example_text,
-        "date_slider_text": date_slider_text,
-        "gene_choice_button_text": gene_choice_button_text,
         "mutation": mutation,
         "mutation_info_header": mutation_info_header,
         "mutation_info": mutation_info,
-        "welcome_text": welcome_text,
-        "further_information_text": further_information_text,
         "lang": language,
         "lang_sw": lang_sw,
         "mutations_names": mutations_names,
         "min_date": min_date,
         "max_date": max_date,
     }
-
+    for text in text_names:
+        var_name = text + "_text"
+        text_value = db.get_text(language, text)
+        template_variables[var_name] = text_value
     return file_html(
         # [controls, last_module],
         [

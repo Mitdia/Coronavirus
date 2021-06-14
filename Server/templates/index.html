@@ -20,7 +20,7 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-brown.css">
         <style>
-        html,body,h1,h2,h3,h4,h5,h6 {font-family: "EB Garamond", sans-serif;}
+        html,body,h1,h2,h3,h4,h5,h6 {font-family: "Open Sans", sans-serif;}
         </style>
         <link rel="stylesheet" href="/static/css/style.css">
         <script src="/static/js/script.js"></script>
@@ -39,21 +39,27 @@
 
 <body>
   <header class="w3-bar w3-light-green">
-	<img src="static/img/logo.svg" class="w3-image" width="100" height="100">
-	<span class="welcome_text">taxameter.ru</span>
-	<span onclick="switch_lang()" class="w3-right w3-button">{{lang_sw}}</span>
+  	<img src="static/img/logo.svg" class="w3-image" width="200" height="200">
+  	<span class="welcome_text">taxameter.ru</span>
+  	<span onclick="switch_lang()" class="w3-right w3-button">{{lang_sw}}</span>
   </header>
 
 
   <div class="w3-row w3-margin w3-padding">
-      {{welcome_text}}
-    </p>
-
+    <div class="w3-col w3-row">
+      <div class="w3-col l10 m10">{{welcome_text}}</div>
+      <div class="w3-right w3-col l2 m2  w3-container">
+        <p>{{together_text}} <a href="https://corgi.center/">&#60;CoRGI&#62;</a></p>
+        <p>{{enabled_text}} <a href="https://www.gisaid.org/">&#60;GISAID&#62;</a></p>
+        <p>{{last_update_text}}</p>
+      </div>
+    </div>
     <p class="w3-strong info_header_text">
       {{mutation_info_header}}
     </p>
     <div class="w3-row w3-light-green w3-col l3 m3">
         <div onclick="home()" class="w3-margin w3-btn w3-col w3-theme-d5 my-btn">{{home_button_text}}</div>
+        <div class="section">
         <p class="w3-strong w3-margin">
           {{variables_text}}
         </p>
@@ -79,7 +85,9 @@
           <a href="/?mutation=S:N501Y&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">S:N501Y</a>,
           <a href="/?mutation=N:A211V&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">N:A211V</a>
         </p>
-        <p class="w3-strong w3-margin">
+      </div>
+      <div class="w3-section">
+        <p class="w3-strong w3-margin w3-margin-top w3-margin-bottom">
           {{date_slider_text}}
         </p>
         <div class="w3-container w3-padding w3-col">
@@ -88,16 +96,11 @@
         <div class="w3-border w3-margin w3-col w3-btn w3-black my-btn" id="update">
           <p>{{update_button_text}}</p>
         </div>
+      </div>
       	<div onclick="outbreakInfoLink('{{outbreak_info_link}}')" class="w3-margin w3-btn w3-col further_information w3-theme-d5 my-btn" id="updateDate">
           <p style="display:inline;">{{further_information_text}} {{mutation}}</p>
         </div>
       </div>
-<!--
-	<div class="further_information w3-light-green w3-button w3-col" onclick="outbreakInfoLink('{{outbreak_info_link}}')">
-	    {{further_information_text}} {{mutation}}
-        </div>
-
--->
     <div class="w3-col l9 m9">
       <div class="w3-border">
         <div id="coronaplot"></div>
@@ -105,18 +108,16 @@
     </div>
   </div>
 
-  <!-- Footer -->
   <footer class="w3-container w3-padding-64 w3-center w3-opacity">
     <div class="w3-xlarge w3-padding-32">
-      <i class="fa fa-facebook-official w3-hover-opacity"></i>
-      <i class="fa fa-instagram w3-hover-opacity"></i>
-      <i class="fa fa-snapchat w3-hover-opacity"></i>
-      <i class="fa fa-pinterest-p w3-hover-opacity"></i>
-      <i class="fa fa-twitter w3-hover-opacity"></i>
-      <i class="fa fa-linkedin w3-hover-opacity"></i>
+      <p>{{definition_begining_text}} <a href="https://faculty.skoltech.ru/people/georgiibazykin">{{lab_name_text}}</a> {{definition_end_text}}</p>
+      <p><a href="">{{DK_name_text}}</a>, <a href="">{{EN_name_text}}</a>, <a href="">{{SG_name_text}}</a>, <a href="https://twitter.com/gbazykin">{{GB_name_text}}</a></p>
+      <p>{{questions_text}}</p>
+      <p>{{cite_text}}</p>
    </div>
    <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
   </footer>
+
   <script>
     var mutations = {{mutations_names}};
     init(mutations);
