@@ -138,3 +138,8 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Data
+samples_data.sqlite
+RussianSamples.GISAID.20210604.csv
+RussianSamples.GISAID.20210604.tab.gz
