@@ -119,7 +119,7 @@ def root():
             ),
         ],  # TODO: remove me CDN only
         CDN,
-        "Coronavirus",
+        "taxameter.ru",
         template=jinja_env.get_template("index.html"),
         template_variables=template_variables,
     )

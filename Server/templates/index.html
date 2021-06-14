@@ -18,6 +18,7 @@
         <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-brown.css">
         <style>
         html,body,h1,h2,h3,h4,h5,h6 {font-family: "EB Garamond", sans-serif;}
         </style>
@@ -52,8 +53,8 @@
       {{mutation_info_header}}
     </p>
     <div class="w3-row w3-light-green w3-col l3 m3">
-        <div onclick="home()" class="w3-margin w3-btn w3-col w3-brown my-btn">{{home_button_text}}</div>
-        <p class="w3-strong info_header_text w3-margin">
+        <div onclick="home()" class="w3-margin w3-btn w3-col w3-theme-d5 my-btn">{{home_button_text}}</div>
+        <p class="w3-strong w3-margin">
           {{variables_text}}
         </p>
         <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
@@ -70,7 +71,7 @@
             <p style="display:inline;" id="mutationNameDropdownButtonText"></p>
           </button>
         </div>
-        <p class="w3-strong info_header_text w3-margin">
+        <p class="w3-strong w3-margin">
           {{date_slider_text}}
         </p>
         <div class="w3-container w3-padding w3-col">
@@ -79,7 +80,7 @@
         <div class="w3-border w3-margin w3-col w3-btn w3-black my-btn" id="update">
           <p>{{update_button_text}}</p>
         </div>
-      	<div onclick="outbreakInfoLink('{{outbreak_info_link}}')" class="w3-margin w3-btn w3-col further_information w3-brown my-btn" id="updateDate">
+      	<div onclick="outbreakInfoLink('{{outbreak_info_link}}')" class="w3-margin w3-btn w3-col further_information w3-theme-d5 my-btn" id="updateDate">
           <p style="display:inline;">{{further_information_text}} {{mutation}}</p>
         </div>
       </div>
