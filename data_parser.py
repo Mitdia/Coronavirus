@@ -91,8 +91,8 @@ def parse_data(regions, adress=Path("Data", "RussianSamples.GISAID.20210604.csv"
                          (mutation_name, RU_header, EN_header, RU_info, EN_info)
                          VALUES
                          (\"{mutation}\",
-                          \"Информация о мутации {mutation}:\",
-                          \"Info about mutation {mutation}:\",
+                          \"Распространенность {mutation}:\",
+                          \"Distribution of {mutation}:\",
                           \"Информация об этой мутации отсутвует.\",
                           \"There is no information about this mutation.\");
                           """
