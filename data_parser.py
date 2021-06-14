@@ -12,7 +12,7 @@ def translate_regions_names(region_name):
             return regions_names[0]
 
 
-def parse_data(regions, adress=Path("Data", "RussianSamples.GISAID.20210604.csv")):
+def parse_data(regions, adress=Path("Data", "RussianSamples.GISAID.20210614.csv")):
     main_data = open(adress, "r", encoding="utf-8")
     data = pd.read_csv(main_data, sep="\t", header=None)
     dbase = sqlite3.connect("samples_data.sqlite")

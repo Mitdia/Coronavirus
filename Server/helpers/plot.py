@@ -68,7 +68,7 @@ def create_main_map(db, lang, min_date, max_date):
 def create_map(db, mutation_name, lang, min_date, max_date):
     p = configure_plot()
     if lang == "RU":
-        no_data_text = "данные отсутсвуют"
+        no_data_text = "нет данных"
     else:
         no_data_text = "no data"
     for region in db.regions(lang):
