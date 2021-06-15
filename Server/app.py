@@ -54,6 +54,64 @@ def date_range_slider():
     return json_item(p, "dateRangeSlider")
 
 
+@app.route("/embed")
+def embed_map():
+    today = datetime.today().strftime("%Y-%m-%d")
+    mutation = request.args.get("mutation", type=str)
+    language = request.args.get("lang", type=str)
+    min_date = request.args.get("min_date", type=str)
+    max_date = request.args.get("max_date", type=str)
+    if (
+        mutation == None
+        or language == None
+        or not check_date_format(min_date)
+        or not check_date_format(max_date)
+    ):
+        return redirect(f"/?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}")
+    lang_sw = "EN"
+    mutations_names = db.mutations_names[1:]
+    if mutation not in mutations_names:
+        mutation = "ALL"
+    if language != "RU":
+        language = "EN"
+        lang_sw = "RU"
+    mutation_info = db.info_about_mutation(mutation, language)
+    mutation_info_header = mutation_info[0]
+    mutation_info = mutation_info[1]
+    text_names = db.text_names
+    outbreak_info_link = create_link_to_outbreak_info(mutation)
+    template_variables = {
+        "outbreak_info_link": outbreak_info_link,
+        "mutation": mutation,
+        "mutation_info_header": mutation_info_header,
+        "mutation_info": mutation_info,
+        "lang": language,
+        "lang_sw": lang_sw,
+        "mutations_names": mutations_names,
+        "min_date": min_date,
+        "max_date": max_date,
+    }
+    for text in text_names:
+        var_name = text + "_text"
+        text_value = db.get_text(language, text)
+        template_variables[var_name] = text_value
+    return file_html(
+        # [controls, last_module],
+        [
+            figure(),
+            DateRangeSlider(
+                value=(date(2016, 1, 1), date(2016, 12, 31)),
+                start=date(2015, 1, 1),
+                end=date(2017, 12, 31),
+            ),
+        ],  # TODO: remove me CDN only
+        CDN,
+        "taxameter.ru",
+        template=jinja_env.get_template("embed.html"),
+        template_variables=template_variables,
+    )
+
+
 @app.route("/")
 def root():
     today = datetime.today().strftime("%Y-%m-%d")

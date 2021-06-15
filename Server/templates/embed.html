@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% macro embed(obj) -%}
+  <div class="bk-root" id="{{ obj.elementid }}"{% if obj.id %} data-root-id="{{ obj.id }}"{% endif %}></div>
+  {%- endmacro %}
+  {% block head %}
+  <head>
+      {% block inner_head %}
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>{% block title %}{{ title | e if title else "Bokeh Plot" }}{% endblock %}</title>
+
+      {% block preamble %}{% endblock %}
+
+      {% block resources %}
+          {% block css_resources %}
+          <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+          <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+          <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-brown.css">
+          <style>
+          html,body,h1,h2,h3,h4,h5,h6 {font-family: "Open Sans", sans-serif;}
+          </style>
+          <link rel="stylesheet" href="/static/css/style.css">
+          <script src="/static/js/script.js"></script>
+          {{ bokeh_css | indent(8) if bokeh_css }}
+          {% endblock %}
+
+          {% block js_resources %}
+          {{ bokeh_js | indent(8) if bokeh_js }}
+          {% endblock %}
+      {% endblock %}
+      {% block postamble %}{% endblock %}
+      {% endblock %}
+  </head>
+  {% endblock %}
+  {% block body %}
+  <body>
+    <p class="w3-strong main_text w3-padding-12 w3-section">
+      {{mutation_info_header}}
+    </p>
+    <div class="w3-row w3-light-green w3-col l3 m3">
+        <div onclick="home()" class="w3-margin w3-btn w3-col w3-theme-d5 my-btn">{{home_button_text}}</div>
+        <div class="w3-section w3-padding-24">
+        <p class="w3-strong w3-margin text">
+          {{variables_text}}
+        </p>
+        <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
+          <button onclick="mainDropdown()" class="w3-btn w3-black my-btn" style="min-width: 100%">
+            <p style="display:inline;">{{gene_choice_button_text}}</p>
+            <p style="display:inline;" id="geneDropdownButtonText"></p>
+          </button>
+          <div id="gene" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
+        </div>
+        <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col" id="mutation">
+          <button class="w3-btn w3-black w3-black my-btn" id="mutationDropdownButton" style="min-width: 100%">
+            <p style="display:inline;">{{mutation_choice_button_text}}</p>
+            <p style="display:inline;" id="mutationDropdownButtonText"></p>
+            <p style="display:inline;" id="mutationNameDropdownButtonText"></p>
+          </button>
+        </div>
+        <p class="w3-strong w3-margin text">
+          {{example_text}}
+          <a href="/?mutation=lineage:B.1.1.7&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Alpha (B.1.1.7)</a>,
+          <a href="/?mutation=lineage:B.1.351&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Beta (B.1.351)</a>,
+          <a href="/?mutation=lineage:B.1.617.2&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Delta (B.1.617.2)</a>,
+          <a href="/?mutation=S:N501Y&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">S:N501Y</a>,
+          <a href="/?mutation=N:A211V&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">N:A211V</a>
+        </p>
+      </div>
+      <div class="w3-section w3-padding-12">
+        <p class="w3-strong w3-margin w3-margin-top w3-margin-bottom text">
+          {{date_slider_text}}
+        </p>
+        <div class="w3-container w3-padding w3-col">
+          <div id="dateRangeSlider"></div>
+        </div>
+        <div class="w3-border w3-margin w3-col w3-btn w3-black my-btn" id="update">
+          <p>{{update_button_text}}</p>
+        </div>
+      </div>
+        <div onclick="outbreakInfoLink('{{outbreak_info_link}}')" class="w3-margin w3-btn w3-col further_information w3-theme-d5 my-btn" id="updateDate">
+          <p style="display:inline;">{{further_information_text}} {{mutation}}  {{resourses_text}}</p>
+        </div>
+      </div>
+    <div class="w3-col l9 m9">
+      <div class="w3-border">
+        <div id="coronaplot"></div>
+      </div>
+    </div>
+    <script>
+      var mutations = {{mutations_names}};
+      init(mutations);
+    </script>
+  </body>
+{% endblock %}
+</html>
