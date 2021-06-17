@@ -91,7 +91,9 @@
     </div>
     <script>
       var mutations = {{mutations_names}};
-      init(mutations);
+      var max_date = "{{max_date}}";
+      console.log(max_date);
+      init(mutations, max_date);
     </script>
   </body>
 {% endblock %}

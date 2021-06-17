@@ -26,7 +26,8 @@ function add_gene_dropdown(gene, mutation_dropdown, gene_dropdown) {
 }
 
 
-function init(mutations) {
+function init(mutations, max_date) {
+  max_date = max_date;
   var mutationDropdownButton =  document.getElementById("mutationDropdownButton");
   var geneDropdownButtonText = document.getElementById("geneDropdownButtonText");
   var mutationDropdownButtonText =  document.getElementById("mutationDropdownButtonText");

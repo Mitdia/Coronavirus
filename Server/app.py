@@ -60,14 +60,14 @@ def embed_map():
     mutation = request.args.get("mutation", type=str)
     language = request.args.get("lang", type=str)
     min_date = request.args.get("min_date", type=str)
-    max_date = request.args.get("max_date", type=str)
+    max_date = request.args.get("max_date", type=str, default=today)
     if (
         mutation == None
         or language == None
         or not check_date_format(min_date)
         or not check_date_format(max_date)
     ):
-        return redirect(f"/?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}")
+        return redirect(f"/embed?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}")
     lang_sw = "EN"
     mutations_names = db.mutations_names[1:]
     if mutation not in mutations_names:
