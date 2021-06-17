@@ -1,12 +1,18 @@
-version: "3.9"
+version: "3.7"
 services:
-  web:
-    build: .
+
+  flask:
+    build: ./flask
+    container_name: flask
+    restart: always
+    environment:
+      - APP_NAME=MyFlaskApp
+    expose:
+      - 8080
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: always
     ports:
-      - "5006:5006"
-    volumes:
-      - .:/app
-    # environment:
-    #   FLASK_ENV: development
-  redis:
-    image: "redis:alpine"
+      - "80:80"
