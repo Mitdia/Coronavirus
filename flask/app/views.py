@@ -66,7 +66,9 @@ def embed_map():
         or not check_date_format(min_date)
         or not check_date_format(max_date)
     ):
-        return redirect(f"/embed?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}")
+        return redirect(
+            f"/embed?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}"
+        )
     lang_sw = "EN"
     mutations_names = db.mutations_names[1:]
     if mutation not in mutations_names:

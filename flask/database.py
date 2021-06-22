@@ -134,7 +134,6 @@ class Database(object):
         db.close()
         return text_names
 
-
     @lru_cache()
     def get_text(self, lang, text_name):
         db = sqlite3.connect(Path("samples_data.sqlite"))
