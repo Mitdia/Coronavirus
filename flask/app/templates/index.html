@@ -53,8 +53,8 @@
     <div class="w3-col w3-row w3-padding-24 w3-section">
       <div class="w3-col text" style="width:70%">{{welcome_text}}</div>
       <div class="w3-right text" style="width:20%">
-        <p>{{together_text}} <a  href="https://corgi.center/"> <img height="20" src="/static/img/corgi.svg"></img></a></p>
-        <p>{{enabled_text}} <a href="https://www.gisaid.org/"> <img height="20" src="/static/img/gisaid.svg"></img></a></p>
+        <p>{{together_text}} <a  href="https://corgi.center/"> <img height="20" src="/static/img/corgi.svg"></a></p>
+        <p>{{enabled_text}} <a href="https://www.gisaid.org/"> <img height="20" src="/static/img/gisaid.svg"></a></p>
         <p>{{last_update_text}}</p>
       </div>
     </div>
@@ -62,25 +62,47 @@
       {{mutation_info_header}}
     </p>
     <div class="w3-row w3-light-green w3-col l3 m4">
-        <div onclick="home()" class="w3-margin w3-btn w3-col w3-theme-d5 my-btn">{{home_button_text}}</div>
-        <div class="w3-section w3-padding-24">
+        <div onclick="home()" title="{{home_button_text}}" class="w3-margin w3-btn w3-col w3-theme-d5 my-btn">
+          <p style="display:inline;">{{home_button_text}}</p>
+        </div>
+        <div class="w3-section w3-padding-24 w3-col">
         <p class="w3-strong w3-margin text">
           {{variables_text}}
         </p>
-        <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
-          <button onclick="mainDropdown()" class="w3-btn w3-black my-btn" style="min-width: 100%">
-            <p style="display:inline;">{{gene_choice_button_text}}</p>
-            <p style="display:inline;" id="geneDropdownButtonText"></p>
-          </button>
-          <div id="gene" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
+        <p class="w3-strong w3-margin text">
+          {{lineage_choice_button_text}}
+          <label class="switch">
+            <input type="checkbox" onclick="switchToLineage()">
+            <span class="slider round"></span>
+          </label>
+          {{gene_choice_button_text}}
+        </p>
+        <div id="geneMutationSection" style="display:none">
+          <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
+            <button onclick="mainDropdown()" class="w3-btn w3-black my-btn" style="min-width: 100%">
+              <p style="display:inline;">{{gene_choice_button_text}}:</p>
+              <p style="display:inline;" id="geneDropdownButtonText"></p>
+            </button>
+            <div id="gene" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
+          </div>
+          <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col " id="mutation">
+            <button class="w3-btn w3-black my-btn" id="mutationDropdownButton" style="min-width: 100%">
+              <p style="display:inline;">{{mutation_choice_button_text}}</p>
+              <p style="display:inline;" id="mutationDropdownButtonText"></p>
+              <p style="display:inline;" id="mutationNameDropdownButtonText"></p>
+            </button>
+          </div>
         </div>
-        <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col" id="mutation">
-          <button class="w3-btn w3-black my-btn" id="mutationDropdownButton" style="min-width: 100%">
-            <p style="display:inline;">{{mutation_choice_button_text}}</p>
-            <p style="display:inline;" id="mutationDropdownButtonText"></p>
-            <p style="display:inline;" id="mutationNameDropdownButtonText"></p>
-          </button>
+        <div id="lineageSection">
+          <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
+            <button onclick="lineageDropdown()" class="w3-btn w3-black my-btn" style="min-width: 100%">
+              <p style="display:inline;">{{lineage_choice_button_text}}:</p>
+              <p style="display:inline;" id="lineageDropdownButtonText"></p>
+            </button>
+            <div id="lineage" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
+          </div>
         </div>
+        <div>
         <p class="w3-strong w3-margin text">
           {{example_text}}
           <a href="/?mutation=lineage:B.1.1.7&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Alpha (B.1.1.7)</a>,
@@ -90,6 +112,7 @@
           <a href="/?mutation=N:A211V&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">N:A211V</a>
         </p>
       </div>
+    </div>
       <div class="w3-section w3-padding-12">
         <p class="w3-strong w3-margin w3-margin-top w3-margin-bottom text">
           {{date_slider_text}}

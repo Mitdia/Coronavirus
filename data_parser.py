@@ -15,7 +15,7 @@ def translate_regions_names(region_name):
 def parse_data(regions, adress=Path("Data", "RussianSamples.GISAID.20210622.csv")):
     main_data = open(adress, "r", encoding="utf-8")
     data = pd.read_csv(main_data, sep="\t", header=None)
-    dbase = sqlite3.connect("samples_data.sqlite")
+    dbase = sqlite3.connect("flask/samples_data.sqlite")
 
     mutations_names = []
     for mutations in data[3]:
@@ -149,7 +149,7 @@ def parse_regions(adress=Path("Data", "RegionsInGADM.txt")):
         else:
             region_index += 1
 
-    dbase = sqlite3.connect("samples_data.sqlite")
+    dbase = sqlite3.connect("flask/samples_data.sqlite")
     dbase.execute("""DROP TABLE IF EXISTS 'regions';""")
     dbase.execute(
         """CREATE TABLE regions (
