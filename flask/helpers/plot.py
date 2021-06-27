@@ -77,10 +77,9 @@ def configure_plot():
 
 
 def create_plot(db, lang, min_date, max_date):
-    if lang == "RU":
-        other = "Другие"
-    else:
-        other = "Other"
+    first_y_label = db.get_text(lang, "first_y_label", "plot_information")
+    second_y_label = db.get_text(lang, "second_y_label", "plot_information")
+    other = db.get_text(lang, "other_text", "plot_information")
     datelist = pd.date_range(min_date, max_date, freq="MS").strftime("%Y-%m").tolist()
     samplelist = [db.number_of_samples_by_month(date) for date in datelist]
     data = {"dates": datelist}
@@ -117,13 +116,14 @@ def create_plot(db, lang, min_date, max_date):
     vbar_stack = p.vbar_stack(
         lineages, x="dates", width=0.9, color=colors, source=data, legend_label=lineages
     )
-    hover = HoverTool(renderers=vbar_stack, tooltips="$name @dates: @$name")
+    hover = HoverTool(renderers=vbar_stack, tooltips="$name @dates: @$name{1.1}%")
     p.add_tools(hover)
     p.y_range.start = 0
     p.y_range = Range1d(0, 100)
+    p.yaxis.axis_label = first_y_label
     p.extra_y_ranges = {"number_of_samples": Range1d(start=0, end=600)}
     p.add_layout(
-        LinearAxis(y_range_name="number_of_samples", axis_label="number of samples"),
+        LinearAxis(y_range_name="number_of_samples", axis_label=second_y_label),
         "right",
     )
     p.line(
@@ -141,6 +141,7 @@ def create_plot(db, lang, min_date, max_date):
     p.legend.location = "top_left"
     p.legend.orientation = "vertical"
     p.legend.background_fill_alpha = 0.1
+    p.legend.items = p.legend.items[::-1]
     layout = column(p, sizing_mode="scale_width")
     return layout
 
@@ -165,10 +166,7 @@ def create_main_map(db, lang, min_date, max_date):
 
 def create_map(db, mutation_name, lang, min_date, max_date):
     p = configure_plot()
-    if lang == "RU":
-        no_data_text = "нет данных"
-    else:
-        no_data_text = "no data"
+    no_data_text = db.get_text(lang, "no_data_text", "plot_information")
     for region in db.regions(lang):
         coordinates_of_region = db.coordinate(region)
         all_variants = db.number_of_samples(region, min_date, max_date)

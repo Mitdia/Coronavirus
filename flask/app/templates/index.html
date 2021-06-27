@@ -47,6 +47,7 @@
     {% block postamble %}{% endblock %}
     {% endblock %}
 </head>
+
 {% endblock %}
 {% block body %}
 {% autoescape false %}
@@ -67,84 +68,86 @@
       </div>
     </div>
     <div class="w3-col w3-row w3-padding-24 w3-section">
-      <p class="w3-strong main_text w3-padding-12 w3-section">{{mutation_info_header}}</p>
-      <div class="w3-row w3-light-green w3-col l3">
-        <div class="w3-section w3-padding-24 w3-col">
-          <div onclick="home()" class="w3-margin w3-btn w3-col w3-theme-d5 my-btn">
-            <p style="display:inline;">{{home_button_text}}</p>
-          </div>
-          <div onclick="outbreakInfoLink('{{outbreak_info_link}}')" class="w3-margin w3-btn w3-col further_information w3-theme-d5 my-btn" id="updateDate">
-            <p style="display:inline;">{{further_information_text}} {{mutation}}  {{resourses_text}}</p>
-          </div>
-        </div>
-        <div class="w3-section w3-padding-24 w3-col">
-          <p class="w3-strong w3-margin text">
-            {{variables_text}}
-          </p>
-          <p class="w3-strong w3-margin text">
-            {{lineage_choice_button_text}}
-            <label class="switch">
-              <input type="checkbox" onclick="switchToLineage()">
-              <span class="slider round"></span>
-            </label>
-            {{gene_choice_button_text}}
-          </p>
-          <div id="geneMutationSection" style="display:none">
-            <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
-              <button onclick="mainDropdown()" class="w3-btn w3-black my-btn" style="min-width: 100%">
-                <p style="display:inline;">{{gene_choice_button_text}}:</p>
-                <p style="display:inline;" id="geneDropdownButtonText"></p>
-              </button>
-              <div id="gene" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
+      <p class="w3-col w3-strong main_text w3-padding-12 w3-section">{{mutation_info_header}}</p>
+      <div class="w3-col w3-row w3-light-green w3-section w3-round-large">
+        <div class="w3-row w3-col l3">
+          <div class="w3-section w3-padding-24 w3-col">
+            <div onclick="home()" class="w3-margin w3-btn w3-col w3-theme-d5 my-btn">
+              <p style="display:inline;">{{home_button_text}}</p>
             </div>
-            <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col " id="mutation">
-              <button class="w3-btn w3-black my-btn" id="mutationDropdownButton" style="min-width: 100%">
-                <p style="display:inline;">{{mutation_choice_button_text}}</p>
-                <p style="display:inline;" id="mutationDropdownButtonText"></p>
-                <p style="display:inline;" id="mutationNameDropdownButtonText"></p>
-              </button>
+            <div onclick="outbreakInfoLink('{{outbreak_info_link}}')" class="w3-margin w3-btn w3-col further_information w3-theme-d5 my-btn" id="updateDate">
+              <p style="display:inline;">{{further_information_text}} {{mutation}}  {{resourses_text}}</p>
             </div>
           </div>
-          <div id="lineageSection">
-            <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
-              <button onclick="lineageDropdown()" class="w3-btn w3-black my-btn" style="min-width: 100%">
-                <p style="display:inline;">{{lineage_choice_button_text}}:</p>
-                <p style="display:inline;" id="lineageDropdownButtonText"></p>
-              </button>
-              <div id="lineage" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
-            </div>
-          </div>
-          <div>
+          <div class="w3-section w3-padding-24 w3-col">
             <p class="w3-strong w3-margin text">
-              {{example_text}}
-              <a href="/?mutation=lineage:B.1.1.7&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Alpha (B.1.1.7)</a>,
-              <a href="/?mutation=lineage:B.1.351&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Beta (B.1.351)</a>,
-              <a href="/?mutation=lineage:B.1.617.2&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Delta (B.1.617.2)</a>,
-              <a href="/?mutation=S:N501Y&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">S:N501Y</a>,
-              <a href="/?mutation=N:A211V&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">N:A211V</a>
+              {{variables_text}}
             </p>
+            <p class="w3-strong w3-margin text">
+              {{lineage_choice_button_text}}
+              <label class="switch">
+                <input type="checkbox" onclick="switchToLineage()">
+                <span class="slider round"></span>
+              </label>
+              {{gene_choice_button_text}}
+            </p>
+            <div id="geneMutationSection" style="display:none">
+              <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
+                <button onclick="mainDropdown()" class="w3-btn w3-black my-btn" style="min-width: 100%">
+                  <p style="display:inline;">{{gene_choice_button_text}}:</p>
+                  <p style="display:inline;" id="geneDropdownButtonText"></p>
+                </button>
+                <div id="gene" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
+              </div>
+              <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col " id="mutation">
+                <button class="w3-btn w3-black my-btn" id="mutationDropdownButton" style="min-width: 100%">
+                  <p style="display:inline;">{{mutation_choice_button_text}}</p>
+                  <p style="display:inline;" id="mutationDropdownButtonText"></p>
+                  <p style="display:inline;" id="mutationNameDropdownButtonText"></p>
+                </button>
+              </div>
+            </div>
+            <div id="lineageSection">
+              <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
+                <button onclick="lineageDropdown()" class="w3-btn w3-black my-btn" style="min-width: 100%">
+                  <p style="display:inline;">{{lineage_choice_button_text}}:</p>
+                  <p style="display:inline;" id="lineageDropdownButtonText"></p>
+                </button>
+                <div id="lineage" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
+              </div>
+            </div>
+            <div>
+              <p class="w3-strong w3-margin text">
+                {{example_text}}
+                <a href="/?mutation=lineage:B.1.1.7&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Alpha (B.1.1.7)</a>,
+                <a href="/?mutation=lineage:B.1.351&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Beta (B.1.351)</a>,
+                <a href="/?mutation=lineage:B.1.617.2&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Delta (B.1.617.2)</a>,
+                <a href="/?mutation=S:N501Y&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">S:N501Y</a>,
+                <a href="/?mutation=N:A211V&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">N:A211V</a>
+              </p>
+            </div>
+          </div>
+          <div class="w3-section w3-padding-24 w3-col">
+            <p class="w3-strong w3-margin w3-margin-top w3-margin-bottom text">
+              {{date_slider_text}}
+            </p>
+            <div class="w3-container w3-padding w3-col">
+              <div id="dateRangeSlider"></div>
+            </div>
+          </div>
+          <div class="w3-section w3-padding-24 w3-col">
+            <div class="w3-border w3-margin w3-btn w3-black my-btn" style="min-width: 90%" id="update">
+              <p>{{update_button_text}}</p>
+            </div>
           </div>
         </div>
-        <div class="w3-section w3-padding-24 w3-col">
-          <p class="w3-strong w3-margin w3-margin-top w3-margin-bottom text">
-            {{date_slider_text}}
-          </p>
-          <div class="w3-container w3-padding w3-col">
-            <div id="dateRangeSlider"></div>
+        <div class="w3-col l9">
+          <div class="w3-border">
+            <div id="coronamap"></div>
           </div>
-        </div>
-        <div class="w3-section w3-padding-24 w3-col">
-          <div class="w3-border w3-margin w3-btn w3-black my-btn" style="min-width: 90%" id="update">
-            <p>{{update_button_text}}</p>
+          <div class="w3-border">
+            <div id="coronaplot"></div>
           </div>
-        </div>
-      </div>
-      <div class="w3-col l9">
-        <div class="w3-border">
-          <div id="coronamap"></div>
-        </div>
-        <div class="w3-border">
-          <div id="coronaplot"></div>
         </div>
       </div>
     </div>

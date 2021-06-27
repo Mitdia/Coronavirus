@@ -195,10 +195,10 @@ class Database(object):
         return text_names
 
     @lru_cache()
-    def get_text(self, lang, text_name):
+    def get_text(self, lang, text_name, table_name="information_text"):
         db = sqlite3.connect(Path("samples_data.sqlite"))
         result = db.execute(
-            f"""SELECT text_body_{lang} FROM information_text
+            f"""SELECT text_body_{lang} FROM {table_name}
                 WHERE text_name = \"{text_name}\"
         """
         ).fetchall()
