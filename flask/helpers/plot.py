@@ -14,7 +14,7 @@ from bokeh.models import (
 )
 from bokeh.models.tools import HoverTool, PanTool, ResetTool, WheelZoomTool
 from bokeh.plotting import figure
-from bokeh.palettes import Category20
+from bokeh.palettes import Category20, Colorblind
 from datetime import date, datetime
 from settings import PLT_HEIGHT, PLT_WIDTH
 
@@ -170,6 +170,7 @@ def create_main_map(db, lang, min_date, max_date):
 def create_map(db, mutation_name, lang, min_date, max_date):
     p = configure_plot()
     no_data_text = db.get_text(lang, "no_data_text", "plot_information")
+    map_tooltip = db.get_text(lang, "map_tooltip", "plot_information")
     for region in db.regions(lang):
         coordinates_of_region = db.coordinate(region)
         all_variants = db.number_of_samples(region, min_date, max_date)
@@ -187,14 +188,18 @@ def create_map(db, mutation_name, lang, min_date, max_date):
             mutation_name, region, min_date, max_date
         )
         nonmutated_variants = all_variants - mutated_variants
+        freq = round(mutated_variants / all_variants * 100, 1)
+        tooltip = f"{region}: {mutated_variants} {map_tooltip} {all_variants} ({freq}%)"
+        first_color = Colorblind[7][5]
+        second_color = Colorblind[7][3]
         if nonmutated_variants == 0:
             p.circle(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
                 radius=10,
                 alpha=0.8,
-                fill_color="red",
-                name=f"{region}: {int(mutated_variants)}/{all_variants}",
+                fill_color=first_color,
+                name=tooltip,
             )
         elif mutated_variants == 0:
             p.circle(
@@ -202,15 +207,12 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 y=PLT_HEIGHT - coordinates_of_region[1],
                 radius=10,
                 alpha=0.8,
-                fill_color="green",
-                name=f"{region}: {int(mutated_variants)}/{all_variants}",
+                fill_color=second_color,
+                name=tooltip,
             )
         else:
             first_angle = mutated_variants / all_variants * 2 * pi
             second_angle = nonmutated_variants / all_variants * 2 * pi
-            first_color = "red"
-            second_color = "green"
-            first_name = f"{region}: {int(mutated_variants)}/{all_variants}"
             p.wedge(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
@@ -219,7 +221,7 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 fill_color=first_color,
                 end_angle=first_angle,
                 line_color="white",
-                name=first_name,
+                name=tooltip,
                 alpha=0.8,
             )
             p.wedge(
@@ -230,7 +232,7 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 fill_color=second_color,
                 end_angle=(second_angle + first_angle),
                 line_color="white",
-                name=first_name,
+                name=tooltip,
                 alpha=0.8,
             )
 
