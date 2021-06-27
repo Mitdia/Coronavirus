@@ -106,6 +106,13 @@
                   <p style="display:inline;" id="mutationNameDropdownButtonText"></p>
                 </button>
               </div>
+              <div>
+                <p class="w3-strong w3-margin text">
+                  {{example_text}}
+                  <a href="/?mutation=S:N501Y&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">S:N501Y</a>,
+                  <a href="/?mutation=N:A211V&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">N:A211V</a>
+                </p>
+              </div>
             </div>
             <div id="lineageSection">
               <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
@@ -115,16 +122,14 @@
                 </button>
                 <div id="lineage" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
               </div>
-            </div>
-            <div>
-              <p class="w3-strong w3-margin text">
-                {{example_text}}
-                <a href="/?mutation=lineage:B.1.1.7&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Alpha (B.1.1.7)</a>,
-                <a href="/?mutation=lineage:B.1.351&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Beta (B.1.351)</a>,
-                <a href="/?mutation=lineage:B.1.617.2&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Delta (B.1.617.2)</a>,
-                <a href="/?mutation=S:N501Y&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">S:N501Y</a>,
-                <a href="/?mutation=N:A211V&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">N:A211V</a>
-              </p>
+              <div>
+                <p class="w3-strong w3-margin text">
+                  {{example_text}}
+                  <a href="/?mutation=lineage:B.1.1.7&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Alpha (B.1.1.7)</a>,
+                  <a href="/?mutation=lineage:B.1.351&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Beta (B.1.351)</a>,
+                  <a href="/?mutation=lineage:B.1.617.2&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Delta (B.1.617.2)</a>,
+                </p>
+              </div>
             </div>
           </div>
           <div class="w3-section w3-padding-24 w3-col">
