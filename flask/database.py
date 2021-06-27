@@ -2,11 +2,16 @@ import sqlite3
 from functools import lru_cache
 from pathlib import Path
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import pandas as pd
 from flask import _app_ctx_stack, current_app
 from loguru import logger
 from rich import print
+
+
+def last_day_of_month(any_day):
+    next_month = any_day.replace(day=28) + timedelta(days=4)
+    return next_month - timedelta(days=next_month.day)
 
 
 class Database(object):
@@ -63,16 +68,40 @@ class Database(object):
         format = "%Y-%m-%d"
         first_date = datetime.strptime(first_date, format)
         last_date = datetime.strptime(last_date, format)
-        result = db.execute(
-            f"""SELECT COUNT(*) FROM samples_data
-                            WHERE (Location_RU = \"{region}\"
-                            OR Location_EN = \"{region}\")
-                            AND Date <= \"{last_date}\"
-                            AND Date >= \"{first_date}\";
-        """
-        )
+        if region == "ALL":
+            result = db.execute(
+                f"""SELECT COUNT(*) FROM samples_data
+                                WHERE Date <= \"{last_date}\"
+                                AND Date >= \"{first_date}\";
+            """
+            )
+        else:
+            result = db.execute(
+                f"""SELECT COUNT(*) FROM samples_data
+                                WHERE (Location_RU = \"{region}\"
+                                OR Location_EN = \"{region}\")
+                                AND Date <= \"{last_date}\"
+                                AND Date >= \"{first_date}\";
+            """
+            )
         result = int(list(result)[0][0])
         db.close()
+        return result
+
+    @lru_cache()
+    def number_of_samples_by_month(self, date="ALL"):
+        if date == "ALL":
+            db = sqlite3.connect(Path("samples_data.sqlite"))
+            result = db.execute(f"SELECT COUNT(*) FROM samples_data")
+            result = int(list(result)[0][0])
+            db.close()
+        else:
+            format = "%Y-%m-%d"
+            first_date = datetime.strptime(date, "%Y-%m")
+            last_date = last_day_of_month(first_date)
+            first_date = datetime.strftime(first_date, format)
+            last_date = datetime.strftime(last_date, format)
+            result = self.number_of_samples("ALL", first_date, last_date)
         return result
 
     @lru_cache()
@@ -87,18 +116,49 @@ class Database(object):
         format = "%Y-%m-%d"
         first_date = datetime.strptime(first_date, format)
         last_date = datetime.strptime(last_date, format)
-        result = db.execute(
-            f"""SELECT COUNT(*) FROM data_about_mutations
-                            WHERE Mutation = \"{mutation}\"
-                            AND (Location_RU = \"{region}\"
-                            OR Location_EN = \"{region}\")
-                            AND Date <= \"{last_date}\"
-                            AND Date >= \"{first_date}\";
-        """
-        )
+        if region == "ALL":
+            result = db.execute(
+                f"""SELECT COUNT(*) FROM data_about_mutations
+                                WHERE Mutation = \"{mutation}\"
+                                AND Date <= \"{last_date}\"
+                                AND Date >= \"{first_date}\";
+            """
+            )
+        else:
+            result = db.execute(
+                f"""SELECT COUNT(*) FROM data_about_mutations
+                                WHERE Mutation = \"{mutation}\"
+                                AND (Location_RU = \"{region}\"
+                                OR Location_EN = \"{region}\")
+                                AND Date <= \"{last_date}\"
+                                AND Date >= \"{first_date}\";
+            """
+            )
         result = int(list(result)[0][0])
         db.close()
 
+        return result
+
+    @lru_cache()
+    def number_of_mutated_variants_by_month(self, mutation, date="ALL"):
+        if date == "ALL":
+            db = sqlite3.connect(Path("samples_data.sqlite"))
+            result = db.execute(
+                f"""SELECT COUNT(*) FROM data_about_mutations
+                                WHERE Mutation = \"{mutation}\";
+                """
+            )
+            result = int(list(result)[0][0])
+            db.close()
+        else:
+            format = "%Y-%m-%d"
+            first_date = datetime.strptime(date, "%Y-%m")
+            last_date = last_day_of_month(first_date)
+            first_date = datetime.strftime(first_date, format)
+            last_date = datetime.strftime(last_date, format)
+            result = self.number_of_mutatated_variants(
+                mutation, "ALL", first_date, last_date
+            )
         return result
 
     @property

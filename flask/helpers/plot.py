@@ -1,12 +1,41 @@
 from math import log2, pi
-
+import pandas as pd
 from functools import lru_cache
 from bokeh.layouts import column, row
-from bokeh.models import Paragraph, Select, Button, CustomJS, DateRangeSlider, Range1d
+from bokeh.models import (
+    Paragraph,
+    Select,
+    Button,
+    CustomJS,
+    DateRangeSlider,
+    Range1d,
+    DatePicker,
+    LinearAxis,
+)
 from bokeh.models.tools import HoverTool, PanTool, ResetTool, WheelZoomTool
 from bokeh.plotting import figure
+from bokeh.palettes import Category20
 from datetime import date, datetime
 from settings import PLT_HEIGHT, PLT_WIDTH
+
+
+def get_most_spread_variants(db):
+    mutations = db.mutations_names
+    number_of_samples = db.number_of_samples_by_month()
+    lineages = {}
+    for mutation in mutations[1:]:
+        lineage = mutation
+        mutation = mutation.split(":")
+        if mutation[0] == "lineage":
+            freq = db.number_of_mutated_variants_by_month(lineage) / number_of_samples
+            if len(lineages) < 15:
+                lineages[mutation[1]] = freq
+                continue
+            min_freq = min(lineages, key=lineages.get)
+            if lineages[min_freq] < freq:
+                del lineages[min_freq]
+                lineages[mutation[1]] = freq
+    return list(lineages.keys())
 
 
 def configure_plot():
@@ -45,6 +74,75 @@ def configure_plot():
         anchor="bottom_left",
     )
     return p
+
+
+def create_plot(db, lang, min_date, max_date):
+    if lang == "RU":
+        other = "Другие"
+    else:
+        other = "Other"
+    datelist = pd.date_range(min_date, max_date, freq="MS").strftime("%Y-%m").tolist()
+    samplelist = [db.number_of_samples_by_month(date) for date in datelist]
+    data = {"dates": datelist}
+    lineages = get_most_spread_variants(db)
+    for lineage in lineages:
+        data[lineage] = []
+    data[other] = []
+    for i in range(len(datelist)):
+        number_of_samples = samplelist[i]
+        date = datelist[i]
+        if number_of_samples == 0:
+            for lineage in lineages:
+                data[lineage].append(0)
+            data[other].append(0)
+            continue
+        other_freq = 100
+        for lineage in lineages:
+            mutated_samples = db.number_of_mutated_variants_by_month(
+                "lineage:" + lineage, date
+            )
+            freq = mutated_samples * 100 / number_of_samples
+            other_freq -= freq
+            data[lineage].append(freq)
+        data[other].append(other_freq)
+    lineages.append(other)
+    colors = Category20[16]
+    p = figure(
+        plot_width=PLT_WIDTH,
+        plot_height=PLT_HEIGHT,
+        x_range=data["dates"],
+        tools=[],
+        toolbar_location=None,
+    )
+    vbar_stack = p.vbar_stack(
+        lineages, x="dates", width=0.9, color=colors, source=data, legend_label=lineages
+    )
+    hover = HoverTool(renderers=vbar_stack, tooltips="$name @dates: @$name")
+    p.add_tools(hover)
+    p.y_range.start = 0
+    p.y_range = Range1d(0, 100)
+    p.extra_y_ranges = {"number_of_samples": Range1d(start=0, end=600)}
+    p.add_layout(
+        LinearAxis(y_range_name="number_of_samples", axis_label="number of samples"),
+        "right",
+    )
+    p.line(
+        datelist,
+        samplelist,
+        y_range_name="number_of_samples",
+        color="black",
+        line_width=3,
+        name="number of samples",
+    )
+    p.x_range.range_padding = 0.1
+    p.xgrid.grid_line_color = None
+    p.axis.minor_tick_line_color = None
+    p.outline_line_color = None
+    p.legend.location = "top_left"
+    p.legend.orientation = "vertical"
+    p.legend.background_fill_alpha = 0.1
+    layout = column(p, sizing_mode="scale_width")
+    return layout
 
 
 def create_main_map(db, lang, min_date, max_date):
@@ -142,21 +240,27 @@ def create_map(db, mutation_name, lang, min_date, max_date):
 def create_date_range_slider(mutation_name, lang, min_date, max_date):
     mind = [int(i) for i in min_date.split("-")]
     maxd = [int(i) for i in max_date.split("-")]
+    # min_date_picker = DatePicker(title='Minimum date', value=date(mind[0], mind[1], mind[2]), min_date=date(2020, 2, 1), max_date=datetime.today().strftime("%Y-%m-%d"))
+    # max_date_picker = DatePicker(title='Maximum date', value=date(maxd[0], maxd[1], maxd[2]), min_date=date(2020, 2, 1), max_date=datetime.today().strftime("%Y-%m-%d"))
     date_range_slider = DateRangeSlider(
         value=(date(mind[0], mind[1], mind[2]), date(maxd[0], maxd[1], maxd[2])),
         start=date(2020, 2, 1),
         end=datetime.today().strftime("%Y-%m-%d"),
         width_policy="max",
     )
+    """
+    min_date_picker.js_on_change(
+        "value",
+        CustomJS(code="minDatePicker(this.value)"),
+    )
+    min_date_picker.js_on_change(
+        "value",
+        CustomJS(code="maxDatePicker(this.value)"),
+    )
+    """
     date_range_slider.js_on_change(
         "value",
         CustomJS(code="dateRangeSlider(this.value[0], this.value[1])"),
     )
+    # return column(row(min_date_picker, max_date_picker), date_range_slider, sizing_mode="scale_width")
     return column(date_range_slider, sizing_mode="scale_width")
-
-
-def create_link_to_outbreak_info(mutation):
-    mutation_array = mutation.split(":")
-    if mutation_array[0] == "lineage":
-        return f"https://outbreak.info/situation-reports?pango={mutation_array[1]}"
-    return f"https://outbreak.info/situation-reports?muts={mutation}"

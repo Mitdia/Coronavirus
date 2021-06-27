@@ -96,12 +96,12 @@ function init(mutations) {
 
     mutation = url.searchParams.get("mutation");
 
-    fetch(`/plot?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}`)
+    fetch(`/map?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}`)
         .then(function(response) {
             return response.json();
         })
         .then(function(item) {
-            return Bokeh.embed.embed_item(item, "coronaplot");
+            return Bokeh.embed.embed_item(item, "coronamap");
         })
 
     fetch(`/dateRangeSlider?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}`)
@@ -111,7 +111,15 @@ function init(mutations) {
         .then(function(item) {
             return Bokeh.embed.embed_item(item, "dateRangeSlider");
         })
-
+    if (mutation == "ALL") {
+      fetch(`/plot?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}`)
+          .then(function(response) {
+              return response.json();
+          })
+          .then(function(item) {
+              return Bokeh.embed.embed_item(item, "coronaplot");
+          })
+    }
 }
 
 function switch_lang() {
@@ -124,7 +132,7 @@ function switch_lang() {
 }
 
 function home() {
-    window.location.href = (`/?mutation=ALL&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+    window.location.href = (`/home?mutation=ALL&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
 }
 
 function closeAllDropdowns(except) {
@@ -233,7 +241,23 @@ function dateRangeSlider(min_timestamp, max_timestamp) {
     max_date = new Date(max_timestamp);
     max_date = max_date.getFullYear() + "-" + (max_date.getMonth() + 1) + "-" + max_date.getDate();
     update.onclick = function() {
-        window.location.href = (`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+        window.location.href = (window.location.pathname + `?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+    };
+}
+
+function minDatePicker(new_min_date) {
+    var update = document.getElementById("update");
+    min_date = new_min_date.replace("-0", "");
+    update.onclick = function() {
+        window.location.href = (window.location.pathname + `?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+    };
+}
+
+function maxDatePicker(new_max_date) {
+    var update = document.getElementById("update");
+    max_date = new_max_date.replace("-0", "");
+    update.onclick = function() {
+        window.location.href = (window.location.pathname + `?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
     };
 }
 

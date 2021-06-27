@@ -10,12 +10,13 @@ from bokeh.resources import CDN
 from database import Database
 from flask import Flask, request, Markup, send_from_directory, redirect
 from helpers.plot import (
+    create_plot,
     create_main_map,
     create_map,
     create_date_range_slider,
-    create_link_to_outbreak_info,
 )
-from helpers.security import check_date_format
+from helpers.security import security_check
+from helpers.template import get_template_variables
 from jinja2 import Environment, PackageLoader, Template
 from loguru import logger
 from settings import SERVER_ADDRESS, SERVER_PORT
@@ -30,16 +31,31 @@ logger.add(
 )
 
 
+@app.route("/map")
+def map():
+    mutation = request.args.get("mutation", default="ALL", type=str)
+    language = request.args.get("lang", default="EN", type=str)
+    min_date = request.args.get("min_date", default="2020-02-01", type=str)
+    max_date = request.args.get("max_date", default="2021-02-09", type=str)
+    if not security_check(db, mutation, language, min_date, max_date):
+        return flask.render_template("error.html")
+    if mutation == "ALL":
+        p = create_main_map(db, language, min_date, max_date)
+    elif mutation in db.mutations_names:
+        p = create_map(db, mutation, language, min_date, max_date)
+    return json_item(p, "coronamap")
+
+
 @app.route("/plot")
 def plot():
     mutation = request.args.get("mutation", default="ALL", type=str)
     language = request.args.get("lang", default="EN", type=str)
     min_date = request.args.get("min_date", default="2020-02-01", type=str)
     max_date = request.args.get("max_date", default="2021-02-09", type=str)
+    if not security_check(db, mutation, language, min_date, max_date):
+        return flask.render_template("error.html")
     if mutation == "ALL":
-        p = create_main_map(db, language, min_date, max_date)
-    elif mutation in db.mutations_names:
-        p = create_map(db, mutation, language, min_date, max_date)
+        p = create_plot(db, language, min_date, max_date)
     return json_item(p, "coronaplot")
 
 
@@ -49,6 +65,8 @@ def date_range_slider():
     language = request.args.get("lang", default="EN", type=str)
     min_date = request.args.get("min_date", default="2020-01-01", type=str)
     max_date = request.args.get("max_date", default="2021-02-09", type=str)
+    if not security_check(db, mutation, language, min_date, max_date):
+        return flask.render_template("error.html")
     p = create_date_range_slider(mutation, language, min_date, max_date)
     return json_item(p, "dateRangeSlider")
 
@@ -60,42 +78,11 @@ def embed_map():
     language = request.args.get("lang", type=str)
     min_date = request.args.get("min_date", type=str)
     max_date = request.args.get("max_date", type=str, default=today)
-    if (
-        mutation == None
-        or language == None
-        or not check_date_format(min_date)
-        or not check_date_format(max_date)
-    ):
+    if not security_check(db, mutation, language, min_date, max_date):
         return redirect(
             f"/embed?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}"
         )
-    lang_sw = "EN"
-    mutations_names = db.mutations_names[1:]
-    if mutation not in mutations_names:
-        mutation = "ALL"
-    if language != "RU":
-        language = "EN"
-        lang_sw = "RU"
-    mutation_info = db.info_about_mutation(mutation, language)
-    mutation_info_header = mutation_info[0]
-    mutation_info = mutation_info[1]
-    text_names = db.text_names
-    outbreak_info_link = create_link_to_outbreak_info(mutation)
-    template_variables = {
-        "outbreak_info_link": outbreak_info_link,
-        "mutation": mutation,
-        "mutation_info_header": mutation_info_header,
-        "mutation_info": mutation_info,
-        "lang": language,
-        "lang_sw": lang_sw,
-        "mutations_names": mutations_names,
-        "min_date": min_date,
-        "max_date": max_date,
-    }
-    for text in text_names:
-        var_name = text + "_text"
-        text_value = db.get_text(language, text)
-        template_variables[var_name] = text_value
+    template_variables = template_variables(db, mutation, language, min_date, max_date)
     return file_html(
         # [controls, last_module],
         [
@@ -113,6 +100,37 @@ def embed_map():
     )
 
 
+@app.route("/home")
+def home():
+    today = datetime.today().strftime("%Y-%m-%d")
+    mutation = request.args.get("mutation", type=str)
+    language = request.args.get("lang", type=str)
+    min_date = request.args.get("min_date", type=str)
+    max_date = request.args.get("max_date", type=str)
+    if not security_check(db, mutation, language, min_date, max_date):
+        return redirect(
+            f"/home?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}"
+        )
+    template_variables = get_template_variables(
+        db, mutation, language, min_date, max_date
+    )
+    return file_html(
+        # [controls, last_module],
+        [
+            figure(),
+            DateRangeSlider(
+                value=(date(2016, 1, 1), date(2016, 12, 31)),
+                start=date(2015, 1, 1),
+                end=date(2017, 12, 31),
+            ),
+        ],  # TODO: remove me CDN only
+        CDN,
+        "taxameter.ru",
+        template=app.jinja_env.get_template("main.html"),
+        template_variables=template_variables,
+    )
+
+
 @app.route("/")
 def root():
     today = datetime.today().strftime("%Y-%m-%d")
@@ -120,40 +138,13 @@ def root():
     language = request.args.get("lang", type=str)
     min_date = request.args.get("min_date", type=str)
     max_date = request.args.get("max_date", type=str)
-    if (
-        mutation == None
-        or language == None
-        or not check_date_format(min_date)
-        or not check_date_format(max_date)
-    ):
-        return redirect(f"/?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}")
-    lang_sw = "EN"
-    mutations_names = db.mutations_names[1:]
-    if mutation not in mutations_names:
-        mutation = "ALL"
-    if language != "RU":
-        language = "EN"
-        lang_sw = "RU"
-    mutation_info = db.info_about_mutation(mutation, language)
-    mutation_info_header = mutation_info[0]
-    mutation_info = mutation_info[1]
-    text_names = db.text_names
-    outbreak_info_link = create_link_to_outbreak_info(mutation)
-    template_variables = {
-        "outbreak_info_link": outbreak_info_link,
-        "mutation": mutation,
-        "mutation_info_header": mutation_info_header,
-        "mutation_info": mutation_info,
-        "lang": language,
-        "lang_sw": lang_sw,
-        "mutations_names": mutations_names,
-        "min_date": min_date,
-        "max_date": max_date,
-    }
-    for text in text_names:
-        var_name = text + "_text"
-        text_value = db.get_text(language, text)
-        template_variables[var_name] = text_value
+    if not security_check(db, mutation, language, min_date, max_date):
+        return redirect(
+            f"/home?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}"
+        )
+    template_variables = get_template_variables(
+        db, mutation, language, min_date, max_date
+    )
     return file_html(
         # [controls, last_module],
         [
