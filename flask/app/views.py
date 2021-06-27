@@ -126,7 +126,7 @@ def home():
         ],  # TODO: remove me CDN only
         CDN,
         "taxameter.ru",
-        template=app.jinja_env.get_template("main.html"),
+        template=app.jinja_env.get_template("index.html"),
         template_variables=template_variables,
     )
 
