@@ -116,7 +116,10 @@ def create_plot(db, lang, min_date, max_date):
     vbar_stack = p.vbar_stack(
         lineages, x="dates", width=0.9, color=colors, source=data, legend_label=lineages
     )
-    hover = HoverTool(renderers=vbar_stack, tooltips="$name @dates: @$name{1.1}%")
+    if lang == "RU":
+        hover = HoverTool(renderers=vbar_stack, tooltips=("Частота $name, @dates: @$name{1.1}%"))
+    else:
+        hover = HoverTool(renderers=vbar_stack, tooltips=("$name prevalence, @dates: @$name{1.1}%"))
     p.add_tools(hover)
     p.y_range.start = 0
     p.y_range = Range1d(0, 100)
