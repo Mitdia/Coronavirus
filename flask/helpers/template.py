@@ -5,12 +5,13 @@ def create_link_to_outbreak_info(mutation):
     return f"https://outbreak.info/situation-reports?muts={mutation}"
 
 
-def get_template_variables(db, language, mutation, min_date, max_date):
+def get_template_variables(db, mutation, language,  min_date, max_date):
     lang_sw = "EN"
     mutations_names = db.mutations_names[1:]
     if mutation not in mutations_names:
         mutation = "ALL"
     if language != "RU":
+        print("hey!", language)
         language = "EN"
         lang_sw = "RU"
     mutation_info = db.info_about_mutation(mutation, language)

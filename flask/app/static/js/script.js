@@ -128,7 +128,7 @@ function switch_lang() {
     } else {
         language = "EN";
     }
-    window.location.href = (`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+    window.location.href = (window.location.pathname + `?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
 }
 
 function home() {
