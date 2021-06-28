@@ -76,7 +76,7 @@ def configure_plot():
     return p
 
 
-def create_plot(db, lang, min_date, max_date):
+def create_plot(db, lang, min_date, max_date, width):
     first_y_label = db.get_text(lang, "first_y_label", "plot_information")
     second_y_label = db.get_text(lang, "second_y_label", "plot_information")
     other = db.get_text(lang, "other_text", "plot_information")
@@ -145,6 +145,9 @@ def create_plot(db, lang, min_date, max_date):
     p.legend.orientation = "vertical"
     p.legend.background_fill_alpha = 0.1
     p.legend.items = p.legend.items[::-1]
+    if width <= 920:
+        p.xaxis.major_label_orientation = pi/3
+        p.legend.items = []
     layout = column(p, sizing_mode="scale_width")
     return layout
 

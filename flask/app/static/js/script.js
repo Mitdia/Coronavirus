@@ -7,6 +7,7 @@ var max_date = url.searchParams.get("max_date");
 var min_date = url.searchParams.get("min_date");
 var language = url.searchParams.get("lang");
 var mutation = url.searchParams.get("mutation");
+var window_width = window.innerWidth;
 
 function add_gene_dropdown(gene, mutation_dropdown, gene_dropdown) {
     var gene_button = document.createElement("div");
@@ -96,7 +97,7 @@ function init(mutations) {
 
     mutation = url.searchParams.get("mutation");
 
-    fetch(`/map?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}`)
+    fetch(`/map?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
         .then(function(response) {
             return response.json();
         })
@@ -112,7 +113,7 @@ function init(mutations) {
             return Bokeh.embed.embed_item(item, "dateRangeSlider");
         })
     if (mutation == "ALL") {
-      fetch(`/plot?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}`)
+      fetch(`/plot?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
           .then(function(response) {
               return response.json();
           })
