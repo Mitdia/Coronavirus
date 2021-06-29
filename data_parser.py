@@ -4,6 +4,32 @@ import pandas as pd
 from map_data import coordinates
 
 
+def number_of_mutated_variants(db, mutation, region):
+    if region == "ALL":
+        result = db.execute(
+            f"SELECT COUNT(*) FROM data_about_mutations WHERE Mutation = \"{mutation}\";")
+    else:
+        result = db.execute(
+            f"""SELECT COUNT(*) FROM data_about_mutations
+                            WHERE Mutation = \"{mutation}\"
+                            AND Location_EN = \"{region}\";
+        """
+        )
+    result = int(list(result)[0][0])
+
+    return result
+
+
+def number_of_samples(db, region):
+    db = sqlite3.connect(Path("flask", "samples_data.sqlite"))
+    if region == "ALL":
+        result = db.execute(f"SELECT COUNT(*) FROM samples_data")
+    else:
+        result = db.execute(f"SELECT COUNT(*) FROM samples_data WHERE Location_EN = \"{region}\";")
+    result = int(list(result)[0][0])
+    return result
+
+
 def translate_regions_names(region_name):
     for regions_names in regions_dictionary:
         if region_name == regions_names[0]:
@@ -15,7 +41,7 @@ def translate_regions_names(region_name):
 def parse_data(regions, adress=Path("Data", "Data.csv")):
     main_data = open(adress, "r", encoding="utf-8")
     data = pd.read_csv(main_data, sep="\t", header=None)
-    dbase = sqlite3.connect("flask/samples_data.sqlite")
+    dbase = sqlite3.connect(Path("flask", "samples_data.sqlite"))
 
     mutations_names = []
     for mutations in data[3]:
@@ -45,6 +71,7 @@ def parse_data(regions, adress=Path("Data", "Data.csv")):
             if mutation_name not in mutations_names and mutation_name != "":
                 mutations_names.append(mutation_name)
     mutations_names.sort()
+
     data = data.rename(
         columns={0: "sample name", 1: "Location_EN", 2: "date", 3: "mutations"}
     )
@@ -81,11 +108,12 @@ def parse_data(regions, adress=Path("Data", "Data.csv")):
                   \"Size of the blue circle logarithmically depends on number of samples, recieved from this region.\");
                   """
     )
-
+    lineages = []
     for mutation in mutations_names:
 
         mutation = mutation[4]
-        print(mutation, end=" ")
+        if mutation.split(":")[0] == "lineage":
+            lineages.append(mutation)
         dbase.execute(
             f"""INSERT INTO mutations
                          (mutation_name, RU_header, EN_header, RU_info, EN_info)
@@ -97,9 +125,9 @@ def parse_data(regions, adress=Path("Data", "Data.csv")):
                           \"There is no information about this mutation.\");
                           """
         )
-
+    print("mutations parsed!")
     dbase.commit()
-
+    """
     pandas_index = 0
     previous_index = -1
 
@@ -124,8 +152,9 @@ def parse_data(regions, adress=Path("Data", "Data.csv")):
     mutation_data.to_sql("data_about_mutations", dbase, if_exists="replace")
     data.to_sql("samples_data", dbase, if_exists="replace")
     dbase.commit()
+    """
     dbase.close()
-    return mutations_names
+    return lineages
 
 
 def parse_regions(adress=Path("Data", "RegionsInGADM.txt")):
@@ -149,14 +178,15 @@ def parse_regions(adress=Path("Data", "RegionsInGADM.txt")):
         else:
             region_index += 1
 
-    dbase = sqlite3.connect("flask/samples_data.sqlite")
+    dbase = sqlite3.connect(Path("flask", "samples_data.sqlite"))
     dbase.execute("""DROP TABLE IF EXISTS 'regions';""")
     dbase.execute(
         """CREATE TABLE regions (
 	                 RU_names TEXT,
 	                 EN_names TEXT,
                      X_coordinate INTEGER,
-                     Y_coordinate INTEGER
+                     Y_coordinate INTEGER,
+                     most_prevaling_lineages Text
 	                 );"""
     )
 
@@ -169,12 +199,44 @@ def parse_regions(adress=Path("Data", "RegionsInGADM.txt")):
                             (RU_names, EN_names, X_coordinate, Y_coordinate)
                             VALUES
                         	(\"{region[1]}\", \"{region[0]}\", {x}, {y});
-                                """
+            """
             )
     dbase.commit()
     dbase.close()
     return regions, regions_dictionary
 
+
+def lineages_freq(lineages_names, reegions):
+        dbase = sqlite3.connect(Path("flask", "samples_data.sqlite"))
+        for region in regions:
+            overall_number_of_samples = number_of_samples(dbase, region)
+            if overall_number_of_samples == 0:
+                continue
+            lineages = {}
+            for lineage in lineages_names:
+                freq = number_of_mutated_variants(dbase, lineage, region)
+                if len(lineages) < 3:
+                    if freq != 0:
+                        lineages[lineage] = freq
+                    continue
+                min_freq = min(lineages, key=lineages.get)
+                if lineages[min_freq] < freq:
+                    del lineages[min_freq]
+                    lineages[lineage] = freq
+            lineage_string = ""
+            for lineage in lineages:
+                lineage_string += lineage.split(":")[1] + ':' + str(round(lineages[lineage], 1)) + ';'
+
+
+            dbase.execute(
+                f"""UPDATE regions
+                    SET most_prevaling_lineages = \"{lineage_string}\"
+                    WHERE EN_names = \"{region}\";
+            """
+            )
+            print(region)
+        dbase.commit()
+        dbase.close()
 
 blocked = [
     "г. Севастополь",
@@ -217,8 +279,5 @@ genes = [
     "ORF10",
 ]
 regions, regions_dictionary = parse_regions()
-mutations_names = parse_data(regions)
-file_for_regions = open(Path("Data", "regions.txt"), "w", encoding="utf-8")
-file_for_mutations_names = open(
-    Path("Data", "mutations_names.txt"), "w", encoding="utf-8"
-)
+lineages = parse_data(regions)
+lineages_freq(lineages, regions)

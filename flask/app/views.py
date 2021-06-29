@@ -53,7 +53,6 @@ def plot():
     min_date = request.args.get("min_date", default="2020-02-01", type=str)
     max_date = request.args.get("max_date", default="2021-02-09", type=str)
     window_size = request.args.get("window_width", type=int)
-    print("Hey!", window_size)
     if not security_check(db, mutation, language, min_date, max_date):
         return flask.render_template("error.html")
     if mutation == "ALL":

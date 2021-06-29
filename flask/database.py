@@ -206,6 +206,28 @@ class Database(object):
         result = list(result)[0][0]
         return result
 
+    @lru_cache()
+    def most_prevaling_lineages(self, region):
+        db = sqlite3.connect(Path("samples_data.sqlite"))
+        result = db.execute(
+            f"""SELECT most_prevaling_lineages FROM regions
+                WHERE (RU_names = \"{region}\"
+                OR EN_names = \"{region}\");
+        """
+        ).fetchall()
+        most_prevaling_lineages = {}
+        if result[0][0] != None:
+            for lineage in result[0][0].split(";"):
+                if lineage != "":
+                    lineage = lineage.split(":")
+                    lineage_name = lineage[0]
+                    lineage_freq = lineage[1]
+                    most_prevaling_lineages[lineage_name] = lineage_freq
+            db.close()
+        return most_prevaling_lineages
+
+
+
     def add_mutation_info(self, mutation, info, lang):
         db = sqlite3.connect(Path("samples_data.sqlite"))
         db.execute(
