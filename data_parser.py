@@ -215,7 +215,7 @@ def lineages_freq(lineages_names, reegions):
             lineages = {}
             for lineage in lineages_names:
                 freq = number_of_mutated_variants(dbase, lineage, region)
-                if len(lineages) < 3:
+                if len(lineages) < 4:
                     if freq != 0:
                         lineages[lineage] = freq
                     continue

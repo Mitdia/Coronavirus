@@ -46,15 +46,29 @@ function init(mutations) {
     };
 
     if (mutation_array[0] == "ALL") {
+      var certainMutationSection = document.getElementById("certainMutationSection");
+      var homeButton = document.getElementById("homeButton");
+      homeButton.onclick = "";
+      homeButton.className = homeButton.className.replace("w3-button w3-theme-d5 w3-hover-blue", "w3-blue");
+      homeButton.style.textAlign = "center";
+      certainMutationSection.style.display = "none";
     }
     else if (mutation_array[0] == "lineage") {
       lineageDropdownButtonText.textContent = mutation_array[1];
+      var certainMutationsButton = document.getElementById("certainMutationsButton");
+      certainMutationsButton.onclick = "";
+      certainMutationsButton.className = certainMutationsButton.className.replace("w3-button w3-theme-d5 w3-hover-blue", "w3-blue");
+      certainMutationsButton.style.textAlign = "center";
     }
     else {
       switchToLineage();
       geneDropdownButtonText.textContent = mutation_array[0];
       mutationDropdownButtonText.textContent = mutation_array[0] + ':';
       mutationNameDropdownButtonText.textContent = mutation_array[1];
+      var certainMutationsButton = document.getElementById("certainMutationsButton");
+      certainMutationsButton.onclick = "";
+      certainMutationsButton.className = certainMutationsButton.className.replace("w3-button w3-theme-d5 w3-hover-blue", "w3-blue");
+      certainMutationsButton.style.textAlign = "center";
     }
 
 
@@ -134,6 +148,10 @@ function switch_lang() {
 
 function home() {
     window.location.href = (`/home?mutation=ALL&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+}
+
+function certainMutations() {
+    window.location.href = (`/?mutation=lineage:B.1.617.2&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
 }
 
 function closeAllDropdowns(except) {

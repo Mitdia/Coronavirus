@@ -152,24 +152,25 @@ def create_plot(db, lang, min_date, max_date, width):
     return layout
 
 
-def create_main_map(db, lang, min_date, max_date):
+def create_main_map(db, lang, min_date, max_date, mode="default"):
     p = configure_plot()
     for region in db.regions(lang):
         other = db.get_text(lang, "other_text", "plot_information")
         coordinates_of_region = db.coordinate(region)
         number_of_samples = db.number_of_samples(region, min_date, max_date)
         if number_of_samples != 0:
-            most_prevaling_lineages = db.most_prevaling_lineages(region)
             radius = log2(number_of_samples + 1) * 5
             name = f"{region}: {number_of_samples}"
-            other_number = number_of_samples
-            for lineage in most_prevaling_lineages:
-                lineage_number = int(most_prevaling_lineages[lineage])
-                other_number -= lineage_number
-                lineage_freq = round(lineage_number / number_of_samples * 100, 1)
-                name += '<br>' + lineage + ' - ' + str(lineage_number) + ' (' + str(lineage_freq) + '%)'
-            other_freq = round(other_number / number_of_samples * 100, 1)
-            name += '<br>' + other + ' - ' + str(other_number) + ' (' + str(other_freq) + '%)'
+            if mode == "main":
+                most_prevaling_lineages = db.most_prevaling_lineages(region)
+                other_number = number_of_samples
+                for lineage in most_prevaling_lineages:
+                    lineage_number = int(most_prevaling_lineages[lineage])
+                    other_number -= lineage_number
+                    lineage_freq = round(lineage_number / number_of_samples * 100, 1)
+                    name += '<br>' + lineage + ' - ' + str(lineage_number) + ' (' + str(lineage_freq) + '%)'
+                other_freq = round(other_number / number_of_samples * 100, 1)
+                name += '<br>' + other + ' - ' + str(other_number) + ' (' + str(other_freq) + '%)'
             p.circle(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
