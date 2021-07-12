@@ -59,7 +59,7 @@ class Database(object):
         return [result[0][0], result[0][1]]
 
     @lru_cache()
-    def number_of_samples(self, region, first_date="default", last_date="default"):
+    def number_of_samples(self, region="ALL", first_date="default", last_date="default"):
         db = sqlite3.connect(Path("samples_data.sqlite"))
         if first_date == "default":
             first_date = self.min_date
@@ -105,8 +105,8 @@ class Database(object):
         return result
 
     @lru_cache()
-    def number_of_mutatated_variants(
-        self, mutation, region, first_date="default", last_date="default"
+    def number_of_mutated_variants(
+        self, mutation, region="ALL", first_date="default", last_date="default"
     ):
         db = sqlite3.connect(Path("samples_data.sqlite"))
         if first_date == "default":
@@ -156,7 +156,7 @@ class Database(object):
             last_date = last_day_of_month(first_date)
             first_date = datetime.strftime(first_date, format)
             last_date = datetime.strftime(last_date, format)
-            result = self.number_of_mutatated_variants(
+            result = self.number_of_mutated_variants(
                 mutation, "ALL", first_date, last_date
             )
         return result

@@ -19,16 +19,16 @@ from datetime import date, datetime
 from settings import PLT_HEIGHT, PLT_WIDTH
 
 
-def get_most_spread_variants(db):
+def get_most_spread_variants(db, min_date, max_date, number):
     mutations = db.mutations_names
-    number_of_samples = db.number_of_samples_by_month()
+    number_of_samples = db.number_of_samples(first_date=min_date, last_date=max_date)
     lineages = {}
     for mutation in mutations[1:]:
         lineage = mutation
         mutation = mutation.split(":")
         if mutation[0] == "lineage":
-            freq = db.number_of_mutated_variants_by_month(lineage) / number_of_samples
-            if len(lineages) < 15:
+            freq = db.number_of_mutated_variants(lineage, first_date=min_date, last_date=max_date) / number_of_samples
+            if len(lineages) < number:
                 lineages[mutation[1]] = freq
                 continue
             min_freq = min(lineages, key=lineages.get)
@@ -83,7 +83,7 @@ def create_plot(db, lang, min_date, max_date, width):
     datelist = pd.date_range(min_date, max_date, freq="MS").strftime("%Y-%m").tolist()
     samplelist = [db.number_of_samples_by_month(date) for date in datelist]
     data = {"dates": datelist}
-    lineages = get_most_spread_variants(db)
+    lineages = get_most_spread_variants(db, min_date, max_date, 15)
     for lineage in lineages:
         data[lineage] = []
     data[other] = []
@@ -152,17 +152,22 @@ def create_plot(db, lang, min_date, max_date, width):
     return layout
 
 
-def create_main_map(db, lang, min_date, max_date, mode="default"):
+def create_main_map(db, lang, min_date, max_date, mode="main"):
     p = configure_plot()
+    most_prevaling_lineages_names = get_most_spread_variants(db, min_date, max_date, 5)
     for region in db.regions(lang):
         other = db.get_text(lang, "other_text", "plot_information")
         coordinates_of_region = db.coordinate(region)
         number_of_samples = db.number_of_samples(region, min_date, max_date)
+        most_prevaling_lineages = {}
+        for lineage in most_prevaling_lineages_names:
+            line = "lineage:" + lineage
+            number = db.number_of_mutated_variants(line, region, min_date, max_date)
+            most_prevaling_lineages[lineage] = number
         if number_of_samples != 0:
             radius = log2(number_of_samples + 1) * 5
             name = f"{region}: {number_of_samples}"
             if mode == "main":
-                most_prevaling_lineages = db.most_prevaling_lineages(region)
                 other_number = number_of_samples
                 for lineage in most_prevaling_lineages:
                     lineage_number = int(most_prevaling_lineages[lineage])
@@ -200,7 +205,7 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 name=f"{region}: {no_data_text}",
             )
             continue
-        mutated_variants = db.number_of_mutatated_variants(
+        mutated_variants = db.number_of_mutated_variants(
             mutation_name, region, min_date, max_date
         )
         nonmutated_variants = all_variants - mutated_variants

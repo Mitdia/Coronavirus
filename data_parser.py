@@ -127,7 +127,6 @@ def parse_data(regions, adress=Path("Data", "Data.csv")):
         )
     print("mutations parsed!")
     dbase.commit()
-    """
     pandas_index = 0
     previous_index = -1
 
@@ -152,7 +151,6 @@ def parse_data(regions, adress=Path("Data", "Data.csv")):
     mutation_data.to_sql("data_about_mutations", dbase, if_exists="replace")
     data.to_sql("samples_data", dbase, if_exists="replace")
     dbase.commit()
-    """
     dbase.close()
     return lineages
 

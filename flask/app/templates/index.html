@@ -134,29 +134,29 @@
               </div>
             </div>
             <div class="w3-section w3-padding-24 w3-col">
-              <p class="w3-strong w3-margin w3-margin-top w3-margin-bottom text">
-                {{date_slider_text}}
-              </p>
-              <div class="w3-container w3-padding w3-col">
-                <div id="dateRangeSlider"></div>
-              </div>
-            </div>
-            <div class="w3-section w3-padding-24 w3-col">
-              <div class="w3-border w3-margin w3-btn w3-black my-btn" style="min-width: 90%" id="update">
-                <p>{{update_button_text}}</p>
-              </div>
               <div onclick="outbreakInfoLink('{{outbreak_info_link}}')" class="w3-margin w3-btn w3-col further_information w3-theme-d5 my-btn" id="updateDate">
                 <p style="display:inline;">{{further_information_text}} {{mutation}}  {{resourses_text}}</p>
               </div>
             </div>
           </div>
+          <div class="w3-section w3-padding-24 w3-col">
+            <p class="w3-strong w3-margin w3-margin-top w3-margin-bottom text">
+              {{date_slider_text}}
+            </p>
+            <div class="w3-container w3-padding w3-col">
+              <div id="dateRangeSlider"></div>
+            </div>
+          </div>
+          <div class="w3-border w3-margin w3-btn w3-black my-btn w3-col" style="min-width: 90%" id="update">
+            <p>{{update_button_text}}</p>
+          </div>
         </div>
         <div class="w3-col l9">
           <div>
-            <div class="w3-border">
+            <div>
               <div id="coronamap"></div>
             </div>
-            <div class="w3-border">
+            <div>
               <div id="coronaplot"></div>
             </div>
           </div>
