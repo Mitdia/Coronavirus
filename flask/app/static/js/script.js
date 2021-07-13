@@ -170,18 +170,16 @@ function init(mutations) {
     }
 
     var previous_dropdown = "None";
+    mutation = url.searchParams.get("mutation");
 }
 
 function switch_lang() {
-    let mut = url.searchParams.get("mutation");
-    let mad = url.searchParams.get("max_date");
-    let mid = url.searchParams.get("min_date");
     if (language == "EN") {
         language = "RU";
     } else {
         language = "EN";
     }
-    window.location.href = (window.location.pathname + `?mutation=${mut}&lang=${language}&min_date=${mid}&max_date=${mad}`);
+    window.location.href = (`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
 }
 
 function home() {
