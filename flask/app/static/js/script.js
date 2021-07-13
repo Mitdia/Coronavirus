@@ -45,15 +45,62 @@ function init(mutations) {
         geneDropdown(mutation.split(':')[0])
     };
 
+    mutation = url.searchParams.get("mutation");
+
+    fetch(`/dateRangeSlider?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}`)
+        .then(function(response) {
+            return response.json();
+        })
+        .then(function(item) {
+            return Bokeh.embed.embed_item(item, "dateRangeSlider");
+        })
+
     if (mutation_array[0] == "ALL") {
-      var certainMutationSection = document.getElementById("certainMutationSection");
+
+      var certainMutationSection = document.getElementsByClassName("certainMutationSection");
+      console.log(certainMutationSection)
       var homeButton = document.getElementById("homeButton");
       homeButton.onclick = "";
       homeButton.className = homeButton.className.replace("w3-button w3-theme-d5 w3-hover-blue", "w3-blue");
       homeButton.style.textAlign = "center";
-      certainMutationSection.style.display = "none";
+      for (var i = 0;  i < certainMutationSection.length; i++) {
+        certainMutationSection[i].style.display = "none";
+      }
+
+      fetch(`/map?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
+          .then(function(response) {
+              return response.json();
+          })
+          .then(function(item) {
+              return Bokeh.embed.embed_item(item, "maincoronamap");
+          })
+
+      fetch(`/plot?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
+          .then(function(response) {
+              return response.json();
+          })
+          .then(function(item) {
+              return Bokeh.embed.embed_item(item, "coronaplot");
+          })
+
     }
+
     else if (mutation_array[0] == "lineage") {
+
+
+      fetch(`/map?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
+          .then(function(response) {
+              return response.json();
+          })
+          .then(function(item) {
+              return Bokeh.embed.embed_item(item, "coronamap");
+          })
+
+      var homeSection = document.getElementsByClassName("homeSection");
+      console.log(homeSection)
+      for (var i = 0;  i < homeSection.length; i++) {
+        homeSection[i].style.display = "none";
+      }
       lineageDropdownButtonText.textContent = mutation_array[1];
       var certainMutationsButton = document.getElementById("certainMutationsButton");
       certainMutationsButton.onclick = "";
@@ -61,6 +108,20 @@ function init(mutations) {
       certainMutationsButton.style.textAlign = "center";
     }
     else {
+
+      fetch(`/map?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
+          .then(function(response) {
+              return response.json();
+          })
+          .then(function(item) {
+              return Bokeh.embed.embed_item(item, "coronamap");
+          })
+
+      var homeSection = document.getElementsByClassName("homeSection");
+      console.log(homeSection)
+      for (var i = 0;  i < homeSection.length; i++) {
+        homeSection[i].style.display = "none";
+      }
       switchToLineage();
       geneDropdownButtonText.textContent = mutation_array[0];
       mutationDropdownButtonText.textContent = mutation_array[0] + ':';
@@ -87,6 +148,7 @@ function init(mutations) {
             gene_button_content = add_gene_dropdown(gene, mutation_dropdown, gene_dropdown);
         }
         if (gene == "lineage") {
+
             var mutation_button = document.createElement("a");
             mutation_button.textContent = mutation_name;
             mutation_button.className = "w3-bar-item w3-button";
@@ -108,42 +170,18 @@ function init(mutations) {
     }
 
     var previous_dropdown = "None";
-
-    mutation = url.searchParams.get("mutation");
-
-    fetch(`/map?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(item) {
-            return Bokeh.embed.embed_item(item, "coronamap");
-        })
-
-    fetch(`/dateRangeSlider?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}`)
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(item) {
-            return Bokeh.embed.embed_item(item, "dateRangeSlider");
-        })
-    if (mutation == "ALL") {
-      fetch(`/plot?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
-          .then(function(response) {
-              return response.json();
-          })
-          .then(function(item) {
-              return Bokeh.embed.embed_item(item, "coronaplot");
-          })
-    }
 }
 
 function switch_lang() {
+    let mut = url.searchParams.get("mutation");
+    let mad = url.searchParams.get("max_date");
+    let mid = url.searchParams.get("min_date");
     if (language == "EN") {
         language = "RU";
     } else {
         language = "EN";
     }
-    window.location.href = (window.location.pathname + `?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+    window.location.href = (window.location.pathname + `?mutation=${mut}&lang=${language}&min_date=${mid}&max_date=${mad}`);
 }
 
 function home() {

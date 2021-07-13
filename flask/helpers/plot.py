@@ -59,9 +59,16 @@ def configure_plot():
     )
     p.x_range = Range1d(0, PLT_WIDTH, bounds="auto")
     p.y_range = Range1d(0, PLT_HEIGHT, bounds="auto")
-    p.grid.visible = False
-    p.axis.visible = False
+    p.xaxis.visible = False
+    p.yaxis.visible = False
+    p.xgrid.visible = False
+    p.ygrid.visible = False
+    p.min_border_left = 0
+    p.min_border_right = 0
+    p.min_border_top = 0
+    p.min_border_bottom = 0
     p.outline_line_width = 0
+    p.outline_line_color = None
     p.match_aspect = True
     p.toolbar.active_scroll = zoom
 
@@ -140,6 +147,7 @@ def create_plot(db, lang, min_date, max_date, width):
     p.x_range.range_padding = 0.1
     p.xgrid.grid_line_color = None
     p.axis.minor_tick_line_color = None
+    p.outline_line_width = 0
     p.outline_line_color = None
     p.legend.location = "top_left"
     p.legend.orientation = "vertical"

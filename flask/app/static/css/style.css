@@ -2,6 +2,12 @@
   font-size: 18px;
 }
 
+.plot_name {
+  white-space: normal;
+  font-size: medium;
+  text-align: center;
+}
+
 .main_text {
   font-size: 25px
 }
