@@ -10,15 +10,22 @@ var mutation = url.searchParams.get("mutation");
 var window_width = window.innerWidth;
 
 
-async function embedBokehElement(address, id){
-  var loader = document.getElementById(id + "Loader");
-  loader.style.display = "block"
-  let response = await fetch(`/${address}?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
-  let item = await response.json()
-  Bokeh.embed.embed_item(item, id)
-  loader.style.display = "none"
+async function embedBokehElement(address, id) {
+  let response = await fetch(`/${address}?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`);
+  let item = await response.json();
+  Bokeh.embed.embed_item(item, id);
 }
 
+
+async function embedBokehElementWithLoader(address, id) {
+  var loader = document.getElementById(id + "Loader");
+  var content = document.getElementById(id);
+  content.style.display = "none";
+  loader.style.display = "block";
+  await embedBokehElement(address, id);
+  loader.style.display = "none";
+  content.style.display = "block";
+}
 
 
 function add_gene_dropdown(gene, mutation_dropdown, gene_dropdown) {
@@ -41,7 +48,8 @@ function add_gene_dropdown(gene, mutation_dropdown, gene_dropdown) {
     return gene_button_content
 }
 
-async function init_home_section() {
+
+function init_home_section() {
 
   var certainMutationSection = document.getElementsByClassName("certainMutationSection");
   var homeButton = document.getElementById("homeButton");
@@ -54,8 +62,8 @@ async function init_home_section() {
   }
 
 
-  embedBokehElement("map", "maincoronamap")
-  embedBokehElement("plot", "coronaplot")
+  embedBokehElementWithLoader("map", "maincoronamap");
+  embedBokehElementWithLoader("plot", "coronaplot");
 
 }
 
@@ -77,24 +85,14 @@ function init(mutations) {
     };
 
     mutation = url.searchParams.get("mutation");
-
-    fetch(`/dateRangeSlider?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}`)
-        .then(function(response) {return response.json();})
-        .then(function(item) {return Bokeh.embed.embed_item(item, "dateRangeSlider");})
-
+    embedBokehElement("dateRangeSlider", "dateRangeSlider");
     if (mutation_array[0] == "ALL") {
       init_home_section()
     }
     else if (mutation_array[0] == "lineage") {
 
 
-      fetch(`/map?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
-          .then(function(response) {
-              return response.json();
-          })
-          .then(function(item) {
-              return Bokeh.embed.embed_item(item, "coronamap");
-          })
+      embedBokehElementWithLoader("map", "coronamap");
 
       var homeSection = document.getElementsByClassName("homeSection");
       for (var i = 0;  i < homeSection.length; i++) {
@@ -108,13 +106,7 @@ function init(mutations) {
     }
     else {
 
-      fetch(`/map?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
-          .then(function(response) {
-              return response.json();
-          })
-          .then(function(item) {
-              return Bokeh.embed.embed_item(item, "coronamap");
-          })
+      embedBokehElementWithLoader("map", "coronamap");
 
       var homeSection = document.getElementsByClassName("homeSection");
       for (var i = 0;  i < homeSection.length; i++) {
