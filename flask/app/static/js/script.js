@@ -9,6 +9,18 @@ var language = url.searchParams.get("lang");
 var mutation = url.searchParams.get("mutation");
 var window_width = window.innerWidth;
 
+
+async function embedBokehElement(address, id){
+  var loader = document.getElementById(id + "Loader");
+  loader.style.display = "block"
+  let response = await fetch(`/${address}?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
+  let item = await response.json()
+  Bokeh.embed.embed_item(item, id)
+  loader.style.display = "none"
+}
+
+
+
 function add_gene_dropdown(gene, mutation_dropdown, gene_dropdown) {
     var gene_button = document.createElement("div");
     gene_button.className = "w3-bar-item w3-dropdown-click";
@@ -29,7 +41,26 @@ function add_gene_dropdown(gene, mutation_dropdown, gene_dropdown) {
     return gene_button_content
 }
 
+async function init_home_section() {
+
+  var certainMutationSection = document.getElementsByClassName("certainMutationSection");
+  var homeButton = document.getElementById("homeButton");
+
+  homeButton.onclick = "";
+  homeButton.className = homeButton.className.replace("w3-button w3-theme-d5 w3-hover-blue", "w3-blue");
+  homeButton.style.textAlign = "center";
+  for (var i = 0;  i < certainMutationSection.length; i++) {
+    certainMutationSection[i].style.display = "none";
+  }
+
+
+  embedBokehElement("map", "maincoronamap")
+  embedBokehElement("plot", "coronaplot")
+
+}
+
 function init(mutations) {
+
     var mutationDropdownButton = document.getElementById("mutationDropdownButton");
     var geneDropdownButtonText = document.getElementById("geneDropdownButtonText");
     var mutationDropdownButtonText = document.getElementById("mutationDropdownButtonText");
@@ -48,43 +79,12 @@ function init(mutations) {
     mutation = url.searchParams.get("mutation");
 
     fetch(`/dateRangeSlider?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}`)
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(item) {
-            return Bokeh.embed.embed_item(item, "dateRangeSlider");
-        })
+        .then(function(response) {return response.json();})
+        .then(function(item) {return Bokeh.embed.embed_item(item, "dateRangeSlider");})
 
     if (mutation_array[0] == "ALL") {
-
-      var certainMutationSection = document.getElementsByClassName("certainMutationSection");
-      console.log(certainMutationSection)
-      var homeButton = document.getElementById("homeButton");
-      homeButton.onclick = "";
-      homeButton.className = homeButton.className.replace("w3-button w3-theme-d5 w3-hover-blue", "w3-blue");
-      homeButton.style.textAlign = "center";
-      for (var i = 0;  i < certainMutationSection.length; i++) {
-        certainMutationSection[i].style.display = "none";
-      }
-
-      fetch(`/map?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
-          .then(function(response) {
-              return response.json();
-          })
-          .then(function(item) {
-              return Bokeh.embed.embed_item(item, "maincoronamap");
-          })
-
-      fetch(`/plot?mutation=${mutation}&lang=${language}&max_date=${max_date}&min_date=${min_date}&window_width=${window_width}`)
-          .then(function(response) {
-              return response.json();
-          })
-          .then(function(item) {
-              return Bokeh.embed.embed_item(item, "coronaplot");
-          })
-
+      init_home_section()
     }
-
     else if (mutation_array[0] == "lineage") {
 
 
@@ -97,7 +97,6 @@ function init(mutations) {
           })
 
       var homeSection = document.getElementsByClassName("homeSection");
-      console.log(homeSection)
       for (var i = 0;  i < homeSection.length; i++) {
         homeSection[i].style.display = "none";
       }
@@ -118,7 +117,6 @@ function init(mutations) {
           })
 
       var homeSection = document.getElementsByClassName("homeSection");
-      console.log(homeSection)
       for (var i = 0;  i < homeSection.length; i++) {
         homeSection[i].style.display = "none";
       }

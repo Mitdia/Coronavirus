@@ -88,3 +88,19 @@ input:checked + .slider:before {
 .slider.round:before {
  border-radius: 50%;
 }
+
+.helper {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.center {
+  vertical-align: middle;
+  width: 4%;
+}
+
+.loader {
+  text-align: center;
+  aspect-ratio: 2/1;
+}

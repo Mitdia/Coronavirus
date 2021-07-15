@@ -16,12 +16,15 @@ from bokeh.models.tools import HoverTool, PanTool, ResetTool, WheelZoomTool
 from bokeh.plotting import figure
 from bokeh.palettes import Category20, Colorblind
 from datetime import date, datetime
+import time
 from settings import PLT_HEIGHT, PLT_WIDTH
 
 
 def get_most_spread_variants(db, min_date, max_date, number):
+    start_time = time.time()
     mutations = db.mutations_names
     number_of_samples = db.number_of_samples(first_date=min_date, last_date=max_date)
+    #print("gmsv.samples recieved --- %s seconds ---" % (time.time() - start_time))
     lineages = {}
     for mutation in mutations[1:]:
         lineage = mutation
@@ -35,6 +38,7 @@ def get_most_spread_variants(db, min_date, max_date, number):
             if lineages[min_freq] < freq:
                 del lineages[min_freq]
                 lineages[mutation[1]] = freq
+            #print("gmsv.mutation parsed --- %s seconds ---" % (time.time() - start_time))
     return list(lineages.keys())
 
 
@@ -84,6 +88,7 @@ def configure_plot():
 
 
 def create_plot(db, lang, min_date, max_date, width):
+    start_time = time.time()
     first_y_label = db.get_text(lang, "first_y_label", "plot_information")
     second_y_label = db.get_text(lang, "second_y_label", "plot_information")
     other = db.get_text(lang, "other_text", "plot_information")
@@ -91,16 +96,18 @@ def create_plot(db, lang, min_date, max_date, width):
     samplelist = [db.number_of_samples_by_month(date) for date in datelist]
     data = {"dates": datelist}
     lineages = get_most_spread_variants(db, min_date, max_date, 15)
+    print("most spread variants recieved --- %s seconds ---" % (time.time() - start_time))
+    length = len(datelist)
     for lineage in lineages:
-        data[lineage] = []
-    data[other] = []
-    for i in range(len(datelist)):
+        data[lineage] = [0 for i in range(length)]
+    data[other] = [0 for i in range(length)]
+    for i in range(length):
         number_of_samples = samplelist[i]
         date = datelist[i]
         if number_of_samples == 0:
             for lineage in lineages:
-                data[lineage].append(0)
-            data[other].append(0)
+                data[lineage][i] = 0
+            data[other][i] = 0
             continue
         other_freq = 100
         for lineage in lineages:
@@ -109,10 +116,11 @@ def create_plot(db, lang, min_date, max_date, width):
             )
             freq = mutated_samples * 100 / number_of_samples
             other_freq -= freq
-            data[lineage].append(freq)
-        data[other].append(other_freq)
+            data[lineage][i] = freq
+        data[other][i] = other_freq
     lineages.append(other)
     colors = Category20[16]
+    print("data formated --- %s seconds ---" % (time.time() - start_time))
     p = figure(
         plot_width=PLT_WIDTH,
         plot_height=PLT_HEIGHT,
@@ -157,6 +165,7 @@ def create_plot(db, lang, min_date, max_date, width):
         p.xaxis.major_label_orientation = pi/3
         p.legend.items = []
     layout = column(p, sizing_mode="scale_width")
+    print("finished --- %s seconds ---" % (time.time() - start_time))
     return layout
 
 

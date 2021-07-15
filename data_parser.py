@@ -38,11 +38,7 @@ def translate_regions_names(region_name):
             return regions_names[0]
 
 
-def parse_data(regions, adress=Path("Data", "Data.csv")):
-    main_data = open(adress, "r", encoding="utf-8")
-    data = pd.read_csv(main_data, sep="\t", header=None)
-    dbase = sqlite3.connect(Path("flask", "samples_data.sqlite"))
-
+def get_mutations_names(data, dbase):
     mutations_names = []
     for mutations in data[3]:
         for mutation_name_raw in mutations.split(","):
@@ -71,21 +67,6 @@ def parse_data(regions, adress=Path("Data", "Data.csv")):
             if mutation_name not in mutations_names and mutation_name != "":
                 mutations_names.append(mutation_name)
     mutations_names.sort()
-
-    data = data.rename(
-        columns={0: "sample name", 1: "Location_EN", 2: "date", 3: "mutations"}
-    )
-    data["Location_RU"] = data["Location_EN"]
-    for region in regions:
-        data["Location_RU"] = data["Location_RU"].replace(
-            [region], translate_regions_names(region)
-        )
-
-    data["date"] = pd.to_datetime(data["date"], errors="coerce")
-    mutation_data = pd.DataFrame(
-        {}, columns=["Mutation", "Location_RU", "Location_EN", "Date", "Sample_ID"]
-    )
-
     dbase.execute("""DROP TABLE IF EXISTS 'mutations';""")
     dbase.execute(
         """CREATE TABLE mutations (
@@ -127,32 +108,7 @@ def parse_data(regions, adress=Path("Data", "Data.csv")):
         )
     print("mutations parsed!")
     dbase.commit()
-    pandas_index = 0
-    previous_index = -1
-
-    for index, row in data.iterrows():
-        if index >= previous_index + 100:
-            print(index)
-            previous_index = index
-        location = row["Location_EN"]
-        date = row["date"]
-        for mutation in row["mutations"].split(","):
-            if mutation != " ":
-
-                mutation_data.loc[pandas_index] = [
-                    mutation,
-                    translate_regions_names(location),
-                    location,
-                    date,
-                    index,
-                ]
-                pandas_index += 1
-
-    mutation_data.to_sql("data_about_mutations", dbase, if_exists="replace")
-    data.to_sql("samples_data", dbase, if_exists="replace")
-    dbase.commit()
-    dbase.close()
-    return lineages
+    return mutations_names
 
 
 def parse_regions(adress=Path("Data", "RegionsInGADM.txt")):
@@ -204,7 +160,63 @@ def parse_regions(adress=Path("Data", "RegionsInGADM.txt")):
     return regions, regions_dictionary
 
 
-def lineages_freq(lineages_names, reegions):
+def get_lineage(mutations):
+    mutations = mutations.split(",")
+    for mutation in mutations:
+        if mutation.split(":")[0] == "lineage":
+            return mutation
+    return "lineage:undefined"
+
+
+def parse_data(regions, adress=Path("Data", "Data.csv")):
+    main_data = open(adress, "r", encoding="utf-8")
+    data = pd.read_csv(main_data, sep="\t", header=None)
+    dbase = sqlite3.connect(Path("flask", "samples_data.sqlite"))
+
+    mutations_names = get_mutations_names(data, dbase)
+
+    data = data.rename(
+        columns={0: "sample name", 1: "Location_EN", 2: "date", 3: "mutations"}
+    )
+    data["Location_RU"] = data["Location_EN"].apply(translate_regions_names)
+    data["lineage"] = data["mutations"].apply(get_lineage)
+
+
+    data["date"] = pd.to_datetime(data["date"], errors="coerce")
+    mutation_data = pd.DataFrame(
+        {}, columns=["Mutation", "Location_RU", "Location_EN", "Date", "Sample_ID"]
+    )
+
+
+    pandas_index = 0
+    previous_index = -1
+    """
+    for index, row in data.iterrows():
+        if index >= previous_index + 100:
+            print(index)
+            previous_index = index
+        location = row["Location_EN"]
+        date = row["date"]
+        for mutation in row["mutations"].split(","):
+            if mutation != " ":
+
+                mutation_data.loc[pandas_index] = [
+                    mutation,
+                    translate_regions_names(location),
+                    location,
+                    date,
+                    index,
+                ]
+                pandas_index += 1
+
+    mutation_data.to_sql("data_about_mutations", dbase, if_exists="replace")
+    """
+    data.to_sql("samples_data", dbase, if_exists="replace")
+    dbase.commit()
+    dbase.close()
+
+
+def lineages_freq(lineages_names, regions):
         dbase = sqlite3.connect(Path("flask", "samples_data.sqlite"))
         for region in regions:
             overall_number_of_samples = number_of_samples(dbase, region)
@@ -276,6 +288,6 @@ genes = [
     "N",
     "ORF10",
 ]
+
 regions, regions_dictionary = parse_regions()
-lineages = parse_data(regions)
-lineages_freq(lineages, regions)
+parse_data(regions)
