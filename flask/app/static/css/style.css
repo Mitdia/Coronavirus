@@ -102,5 +102,5 @@ input:checked + .slider:before {
 
 .loader {
   text-align: center;
-  aspect-ratio: 2/1;
+  aspect-ratio: 1.71;
 }

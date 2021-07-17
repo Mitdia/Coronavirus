@@ -83,7 +83,7 @@ def embed_map():
         return redirect(
             f"/embed?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}"
         )
-    template_variables = template_variables(db, mutation, language, min_date, max_date)
+    template_variables = get_template_variables(db, mutation, language, min_date, max_date)
     return file_html(
         # [controls, last_module],
         [

@@ -67,6 +67,22 @@ function init_home_section() {
 
 }
 
+
+function init_mutation_section() {
+  embedBokehElementWithLoader("map", "coronamap");
+
+  var homeSection = document.getElementsByClassName("homeSection");
+  for (var i = 0;  i < homeSection.length; i++) {
+    homeSection[i].style.display = "none";
+  }
+
+  var certainMutationsButton = document.getElementById("certainMutationsButton");
+  certainMutationsButton.onclick = "";
+  certainMutationsButton.className = certainMutationsButton.className.replace("w3-button w3-theme-d5 w3-hover-blue", "w3-blue");
+  certainMutationsButton.style.textAlign = "center";
+}
+
+
 function init(mutations) {
 
     var mutationDropdownButton = document.getElementById("mutationDropdownButton");
@@ -74,7 +90,6 @@ function init(mutations) {
     var mutationDropdownButtonText = document.getElementById("mutationDropdownButtonText");
     var mutationNameDropdownButtonText = document.getElementById("mutationNameDropdownButtonText");
     var lineageDropdownButtonText = document.getElementById("lineageDropdownButtonText");
-
     var lineage_dropdown = document.getElementById("lineage");
     var gene_dropdown = document.getElementById("gene");
     var mutation_dropdown = document.getElementById("mutation");
@@ -87,39 +102,18 @@ function init(mutations) {
     mutation = url.searchParams.get("mutation");
     embedBokehElement("dateRangeSlider", "dateRangeSlider");
     if (mutation_array[0] == "ALL") {
-      init_home_section()
+      init_home_section();
     }
     else if (mutation_array[0] == "lineage") {
-
-
-      embedBokehElementWithLoader("map", "coronamap");
-
-      var homeSection = document.getElementsByClassName("homeSection");
-      for (var i = 0;  i < homeSection.length; i++) {
-        homeSection[i].style.display = "none";
-      }
+      init_mutation_section();
       lineageDropdownButtonText.textContent = mutation_array[1];
-      var certainMutationsButton = document.getElementById("certainMutationsButton");
-      certainMutationsButton.onclick = "";
-      certainMutationsButton.className = certainMutationsButton.className.replace("w3-button w3-theme-d5 w3-hover-blue", "w3-blue");
-      certainMutationsButton.style.textAlign = "center";
     }
     else {
-
-      embedBokehElementWithLoader("map", "coronamap");
-
-      var homeSection = document.getElementsByClassName("homeSection");
-      for (var i = 0;  i < homeSection.length; i++) {
-        homeSection[i].style.display = "none";
-      }
+      init_mutation_section();
       switchToLineage();
       geneDropdownButtonText.textContent = mutation_array[0];
       mutationDropdownButtonText.textContent = mutation_array[0] + ':';
       mutationNameDropdownButtonText.textContent = mutation_array[1];
-      var certainMutationsButton = document.getElementById("certainMutationsButton");
-      certainMutationsButton.onclick = "";
-      certainMutationsButton.className = certainMutationsButton.className.replace("w3-button w3-theme-d5 w3-hover-blue", "w3-blue");
-      certainMutationsButton.style.textAlign = "center";
     }
 
 
@@ -163,6 +157,7 @@ function init(mutations) {
     mutation = url.searchParams.get("mutation");
 }
 
+
 function switch_lang() {
     if (language == "EN") {
         language = "RU";
@@ -172,13 +167,16 @@ function switch_lang() {
     window.location.href = (`/?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
 }
 
+
 function home() {
     window.location.href = (`/home?mutation=ALL&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
 }
 
+
 function certainMutations() {
     window.location.href = (`/?mutation=lineage:B.1.617.2&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
 }
+
 
 function closeAllDropdowns(except) {
     if (except != "gene") {
@@ -201,6 +199,7 @@ function closeAllDropdowns(except) {
         }
     }
 }
+
 
 function geneDropdown(id) {
     closeAllDropdowns(id);
@@ -237,6 +236,7 @@ function geneDropdown(id) {
     }
 }
 
+
 function mainDropdown() {
     closeAllDropdowns("gene");
     var x = document.getElementById("gene");
@@ -247,6 +247,7 @@ function mainDropdown() {
     }
 }
 
+
 function lineageDropdown() {
     closeAllDropdowns("lineage");
     var x = document.getElementById("lineage");
@@ -256,6 +257,7 @@ function lineageDropdown() {
         x.className = x.className.replace(" w3-show", "");
     }
 }
+
 
 function changeUpdate(new_mutation) {
     closeAllDropdowns();
@@ -268,6 +270,7 @@ function changeUpdate(new_mutation) {
     mutationNameDropdownButtonText.textContent = mutation.split(':')[1];
 }
 
+
 function changeUpdateLineage(new_lineage) {
     closeAllDropdowns();
     mutation = new_lineage;
@@ -278,6 +281,7 @@ function changeUpdateLineage(new_lineage) {
     }
     lineageDropdownButtonText.textContent = mutation.split(':')[1];
 }
+
 
 function dateRangeSlider(min_timestamp, max_timestamp) {
     var update = document.getElementById("update");
@@ -290,6 +294,7 @@ function dateRangeSlider(min_timestamp, max_timestamp) {
     };
 }
 
+
 function minDatePicker(new_min_date) {
     var update = document.getElementById("update");
     min_date = new_min_date.replace("-0", "");
@@ -297,6 +302,7 @@ function minDatePicker(new_min_date) {
         window.location.href = (window.location.pathname + `?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
     };
 }
+
 
 function maxDatePicker(new_max_date) {
     var update = document.getElementById("update");
@@ -306,10 +312,12 @@ function maxDatePicker(new_max_date) {
     };
 }
 
+
 function outbreakInfoLink(outbreak_link) {
     console.log(outbreakInfoLink);
     window.location.href = (outbreak_link);
 }
+
 
 function switchToLineage() {
   closeAllDropdowns();
