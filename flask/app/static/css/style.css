@@ -97,7 +97,7 @@ input:checked + .slider:before {
 
 .center {
   vertical-align: middle;
-  width: 4%;
+  width: 10%;
 }
 
 .loader {
