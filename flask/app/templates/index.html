@@ -78,11 +78,11 @@
               <div id="dateRangeSlider"></div>
             </div>
           </div>
-          <div class="w3-col">
-            <div onclick="home()" class="w3-border w3-padding-24 w3-button w3-theme-d5 w3-hover-blue w3-col further_information" id="homeButton">
+          <div class="w3-row">
+            <div onclick="home()" class="w3-border-top w3-border-bottom w3-border-left w3-padding-24 w3-button w3-theme-d5 w3-hover-blue w3-col l11 m11 s11 w3-border-right further_information" id="homeButton">
               <p class="w3-center" style="display:inline;"> {{home_button_text}} </p>
             </div>
-            <div onclick="certainMutations()" class="w3-border w3-padding-24 w3-button w3-theme-d5 w3-hover-blue w3-col further_information" id="certainMutationsButton">
+            <div onclick="certainMutations()" class="w3-border-top w3-border-bottom w3-border-left w3-padding-24 w3-button w3-theme-d5 w3-hover-blue w3-col l11 m11 s11 w3-border-right further_information" id="certainMutationsButton">
               <p style="display:inline;"> {{mutation_button_text}} </p>
             </div>
           </div>
@@ -158,7 +158,7 @@
         </div>
         <div class="w3-col l9">
           <div class="certainMutationSection">
-            <div class="w3-padding">
+            <div class="w3-margin-right w3-section">
               <p class="plot_name">{{map_name_text}} {{mutation}}</p>
               <div id="coronamapLoader" class="w3-white loader">
                 <span class="helper"></span>
@@ -168,7 +168,7 @@
             </div>
           </div>
           <div class="homeSection">
-            <div class="w3-padding">
+            <div class="w3-margin-right w3-section">
               <p class="plot_name">{{main_map_name_text}}</p>
               <div id="maincoronamapLoader" class="w3-white loader">
                 <span class="helper"></span>
@@ -176,7 +176,7 @@
               </div>
               <div id="maincoronamap"></div>
             </div>
-            <div class="w3-padding">
+            <div class="w3-margin-right w3-section">
               <p class="plot_name">{{plot_name_text}}</p>
               <div id="coronaplotLoader" class="w3-white loader">
                 <span class="helper"></span>

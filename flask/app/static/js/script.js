@@ -55,7 +55,7 @@ function init_home_section() {
   var homeButton = document.getElementById("homeButton");
 
   homeButton.onclick = "";
-  homeButton.className = homeButton.className.replace("w3-button w3-theme-d5 w3-hover-blue", "w3-blue");
+  homeButton.className = homeButton.className.replace("w3-button w3-theme-d5 w3-hover-blue w3-col l11 m11 s11 w3-border-right", "w3-blue w3-col");
   homeButton.style.textAlign = "center";
   for (var i = 0;  i < certainMutationSection.length; i++) {
     certainMutationSection[i].style.display = "none";
@@ -78,7 +78,7 @@ function init_mutation_section() {
 
   var certainMutationsButton = document.getElementById("certainMutationsButton");
   certainMutationsButton.onclick = "";
-  certainMutationsButton.className = certainMutationsButton.className.replace("w3-button w3-theme-d5 w3-hover-blue", "w3-blue");
+  certainMutationsButton.className = certainMutationsButton.className.replace("w3-button w3-theme-d5 w3-hover-blue w3-col l11 m11 s11 w3-border-right", "w3-blue w3-col");
   certainMutationsButton.style.textAlign = "center";
 }
 

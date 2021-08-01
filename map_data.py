@@ -62,7 +62,7 @@ coordinates = {
     "Tyumen'": [510, 640],
     "Chelyabinsk": [420, 660],
     "Gorno-Altay": [700, 800],
-    "Buryat": [980, 720],
+    "Republic of Buryatia": [980, 720],
     "Tuva": [810, 790],
     "Khakass": [750, 755],
     "Altay": [650, 770],
@@ -78,9 +78,9 @@ coordinates = {
     "Primor'ye": [1340, 730],
     "Khabarovsk": [1200, 510],
     "Amur": [1160, 630],
-    "Maga Buryatdan": [1250, 320],
+    "Magadan": [1250, 320],
     "Sakhalin": [1355, 575],
     "Yevrey": [1265, 690],
-    "Chukot": [1260, 150],
+    "Chukotka": [1260, 150],
 }
 regions = list(coordinates)
