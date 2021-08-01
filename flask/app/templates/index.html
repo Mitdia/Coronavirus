@@ -88,17 +88,23 @@
           </div>
           <div class="w3-section w3-col certainMutationSection">
             <div class="w3-section w3-padding w3-col">
-              <p class="w3-strong w3-margin text">
+              <div class="w3-strong w3-margin text">
                 {{variables_text}}
-              </p>
-              <p class="w3-strong w3-margin text">
-                {{lineage_choice_button_text}}
-                <label class="switch">
-                  <input type="checkbox" onclick="switchToLineage()">
-                  <span class="slider round"></span>
-                </label>
-                {{gene_choice_button_text}}
-              </p>
+              </div>
+              <div class="w3-strong w3-margin text w3-row">
+                <div class="w3-col l4 m4 s4">
+                  {{lineage_choice_button_text}}
+                </div>
+                <div class="w3-col l4 m4 s4">
+                  <label class="switch">
+                    <input type="checkbox" onclick="switchToLineage()">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+                <div class="w3-col l4 m4 s4">
+                  {{gene_choice_button_text}}
+                </div>
+              </div>
               <div id="geneMutationSection" style="display:none">
                 <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
                   <button onclick="mainDropdown()" class="w3-btn w3-black my-btn" style="min-width: 100%">

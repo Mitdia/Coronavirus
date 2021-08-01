@@ -11,12 +11,14 @@ from bokeh.models import (
     Range1d,
     DatePicker,
     LinearAxis,
+    Div,
 )
 from bokeh.models.tools import HoverTool, PanTool, ResetTool, WheelZoomTool
 from bokeh.plotting import figure
 from bokeh.palettes import Category20, Colorblind
 from datetime import date, datetime
 import time
+from functools import lru_cache
 from settings import PLT_HEIGHT, PLT_WIDTH
 
 
@@ -24,6 +26,8 @@ def get_most_spread_variants(db, min_date, max_date, number):
     start_time = time.time()
     mutations = db.mutations_names
     number_of_samples = db.number_of_samples(first_date=min_date, last_date=max_date)
+    if number_of_samples == 0:
+        return []
     #print("gmsv.samples recieved --- %s seconds ---" % (time.time() - start_time))
     lineages = {}
     for mutation in mutations[1:]:
@@ -96,6 +100,9 @@ def create_plot(db, lang, min_date, max_date, width):
     samplelist = [db.number_of_samples_by_month(date) for date in datelist]
     data = {"dates": datelist}
     lineages = get_most_spread_variants(db, min_date, max_date, 15)
+    if len(lineages) == 0:
+        no_data_div = Div(text="No data", width=PLT_WIDTH, height=PLT_HEIGHT)
+        return no_data_div
     print("most spread variants recieved --- %s seconds ---" % (time.time() - start_time))
     length = len(datelist)
     for lineage in lineages:
