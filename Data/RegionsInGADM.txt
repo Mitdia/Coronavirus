@@ -6,10 +6,10 @@ Astrakhan',Астраханская область
 Bashkortostan,Республика Башкортостан
 Belgorod,Белгородская область
 Bryansk,Брянская область
-Buryat,Республика Бурятия
+Republic of Buryatia,Республика Бурятия
 Chechnya,Чеченская республика
 Chelyabinsk,Челябинская область
-Chukot,Чукотский АОк
+Chukotka,Чукотский АОк
 Chuvash,Чувашская Республика
 City of St. Petersburg,г. Санкт-Петербург
 Dagestan,Республика Дагестан
@@ -36,7 +36,7 @@ Krasnoyarsk,Красноярский край
 Kurgan,Курганская область
 Kursk,Курская область
 Lipetsk,Липецкая область
-Maga Buryatdan,Магаданская область
+Magadan,Магаданская область
 Mariy-El,Республика Марий Эл
 Mordovia,Республика Мордовия
 Moscow City,г. Москва

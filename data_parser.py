@@ -190,7 +190,7 @@ def parse_data(regions, adress=Path("Data", "Data.csv")):
 
     pandas_index = 0
     previous_index = -1
-    """
+
     for index, row in data.iterrows():
         if index >= previous_index + 100:
             print(index)
@@ -210,7 +210,7 @@ def parse_data(regions, adress=Path("Data", "Data.csv")):
                 pandas_index += 1
 
     mutation_data.to_sql("data_about_mutations", dbase, if_exists="replace")
-    """
+    
     data.to_sql("samples_data", dbase, if_exists="replace")
     dbase.commit()
     dbase.close()
