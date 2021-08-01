@@ -1,104 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
-  {% macro embed(obj) -%}
-  <div class="bk-root" id="{{ obj.elementid }}"{% if obj.id %} data-root-id="{{ obj.id }}"{% endif %}></div>
-  {%- endmacro %}
-  {% block head %}
-  <head>
-      {% block inner_head %}
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>{% block title %}{{ title | e if title else "Bokeh Plot" }}{% endblock %}</title>
+{% macro embed(obj) -%}
+<div class="bk-root" id="{{ obj.elementid }}"{% if obj.id %} data-root-id="{{ obj.id }}"{% endif %}></div>
+{%- endmacro %}
+{% block head %}
 
-      {% block preamble %}{% endblock %}
+<head>
+    {% block inner_head %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ title | e if title else "Bokeh Plot" }}{% endblock %}</title>
 
-      {% block resources %}
-          {% block css_resources %}
-          <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-          <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
-          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
-          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-          <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-brown.css">
-          <style>
-          html,body,h1,h2,h3,h4,h5,h6 {font-family: "Open Sans", sans-serif;}
-          </style>
-          <link rel="stylesheet" href="/static/css/style.css">
-          <script src="/static/js/embed_script.js"></script>
-          {{ bokeh_css | indent(8) if bokeh_css }}
-          {% endblock %}
+    {% block preamble %}{% endblock %}
 
-          {% block js_resources %}
-          {% autoescape false %}
-          {{ bokeh_js | indent(8) if bokeh_js }}
-          {% endautoescape %}
-          {% endblock %}
-      {% endblock %}
-      {% block postamble %}{% endblock %}
-      {% endblock %}
-  </head>
-  {% endblock %}
-  {% block body %}
-  {% autoescape false %}
-  <body>
-    <p class="w3-strong main_text w3-padding-12 w3-section">
-      {{mutation_info_header}}
-    </p>
-    <div class="w3-row w3-light-green w3-col l3 m3">
-        <div onclick="home()" class="w3-margin w3-btn w3-col w3-theme-d5 my-btn">{{home_button_text}}</div>
-        <div class="w3-section w3-padding-24">
-        <p class="w3-strong w3-margin text">
-          {{variables_text}}
-        </p>
-        <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
-          <button onclick="mainDropdown()" class="w3-btn w3-black my-btn" style="min-width: 100%">
-            <p style="display:inline;">{{gene_choice_button_text}}</p>
-            <p style="display:inline;" id="geneDropdownButtonText"></p>
-          </button>
-          <div id="gene" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
-        </div>
-        <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col" id="mutation">
-          <button class="w3-btn w3-black w3-black my-btn" id="mutationDropdownButton" style="min-width: 100%">
-            <p style="display:inline;">{{mutation_choice_button_text}}</p>
-            <p style="display:inline;" id="mutationDropdownButtonText"></p>
-            <p style="display:inline;" id="mutationNameDropdownButtonText"></p>
-          </button>
-        </div>
-        <p class="w3-strong w3-margin text">
-          {{example_text}}
-          <a href="/embed?mutation=lineage:B.1.1.7&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Alpha (B.1.1.7)</a>,
-          <a href="/embed?mutation=lineage:B.1.351&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Beta (B.1.351)</a>,
-          <a href="/embed?mutation=lineage:B.1.617.2&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Delta (B.1.617.2)</a>,
-          <a href="/embed?mutation=S:N501Y&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">S:N501Y</a>,
-          <a href="/embed?mutation=N:A211V&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">N:A211V</a>
-        </p>
-      </div>
-      <div class="w3-section w3-padding-12">
-        <p class="w3-strong w3-margin w3-margin-top w3-margin-bottom text">
-          {{date_slider_text}}
-        </p>
-        <div class="w3-container w3-padding w3-col">
-          <div id="dateRangeSlider"></div>
-        </div>
-        <div class="w3-border w3-margin w3-col w3-btn w3-black my-btn" id="update">
-          <p>{{update_button_text}}</p>
-        </div>
-      </div>
-        <div onclick="outbreakInfoLink('{{outbreak_info_link}}')" class="w3-margin w3-btn w3-col further_information w3-theme-d5 my-btn" id="updateDate">
-          <p style="display:inline;">{{further_information_text}} {{mutation}}  {{resourses_text}}</p>
-        </div>
-      </div>
-    <div class="w3-col l9 m9">
-      <div class="w3-border">
-        <div id="coronaplot"></div>
+    {% block resources %}
+        {% block css_resources %}
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-brown.css">
+        <link rel="stylesheet" href="/static/css/style.css">
+        <style>
+        html,body,h1,h2,h3,h4,h5,h6 {font-family: "Open Sans", sans-serif;}
+        </style>
+
+
+        <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+        <script src="/static/js/script.js"></script>
+
+
+
+
+        <script src="https://www.w3counter.com/tracker.js?id=138091"></script>
+
+        {{ bokeh_css | indent(8) if bokeh_css }}
+        {% endblock %}
+
+        {% block js_resources %}
+        {% autoescape false %}
+        {{ bokeh_js | indent(8) if bokeh_js}}
+        {% endautoescape %}
+        {% endblock %}
+    {% endblock %}
+    {% block postamble %}{% endblock %}
+    {% endblock %}
+</head>
+
+{% endblock %}
+{% block body %}
+{% autoescape false %}
+<body>
+  <header class="w3-bar w3-light-green">
+  	<img src="static/img/logo.svg" class="w3-image" width="200" height="200">
+  	<span class="logo_text">taxameter.ru</span>
+  	<span onclick="switch_lang()" class="w3-right w3-button">{{lang_sw}}</span>
+  </header>
+
+  <div class="w3-row w3-margin w3-padding">
+    <div class="w3-col w3-row w3-padding-24 w3-section">
+      <div class="w3-col text" style="width:70%">{{welcome_text}}</div>
+      <div class="w3-right text" style="width:20%">
+        <p>{{together_text}} <a  href="https://corgi.center/"> <img height="20" src="/static/img/corgi.svg"></a></p>
+        <p>{{enabled_text}} <a href="https://www.gisaid.org/"> <img height="20" src="/static/img/gisaid.svg"></a></p>
+        <p>{{last_update_text}}</p>
       </div>
     </div>
-    <script>
-      var mutations = {{mutations_names}};
-      var max_date = "{{max_date}}";
-      console.log(max_date);
-      init(mutations, max_date);
-    </script>
-  </body>
-  {% endautoescape %}
-  {% endblock %}
+    <div class="w3-col w3-row w3-padding-24 w3-section">
+      <div class="w3-col w3-row w3-light-green w3-section w3-round-large">
+        <div class="w3-row w3-col l3">
+          <div class="w3-section w3-padding w3-col">
+            <p class="w3-strong w3-margin w3-margin-top w3-margin-bottom text">
+              {{date_slider_text}}
+            </p>
+            <div class="w3-container w3-padding w3-col">
+              <div id="dateRangeSlider"></div>
+            </div>
+          </div>
+          <div class="w3-row">
+            <div onclick="home()" class="w3-border-top w3-border-bottom w3-border-left w3-padding-24 w3-button w3-theme-d5 w3-hover-blue w3-col l11 m11 s11 w3-border-right further_information" id="homeButton">
+              <p class="w3-center" style="display:inline;"> {{home_button_text}} </p>
+            </div>
+            <div onclick="certainMutations()" class="w3-border-top w3-border-bottom w3-border-left w3-padding-24 w3-button w3-theme-d5 w3-hover-blue w3-col l11 m11 s11 w3-border-right further_information" id="certainMutationsButton">
+              <p style="display:inline;"> {{mutation_button_text}} </p>
+            </div>
+          </div>
+          <div class="w3-section w3-col certainMutationSection">
+            <div class="w3-section w3-padding w3-col">
+              <div class="w3-strong w3-margin text">
+                {{variables_text}}
+              </div>
+              <div class="w3-strong w3-margin text w3-row">
+                <div class="w3-col l4 m4 s4">
+                  {{lineage_choice_button_text}}
+                </div>
+                <div class="w3-col l4 m4 s4">
+                  <label class="switch">
+                    <input type="checkbox" onclick="switchToLineage()">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+                <div class="w3-col l4 m4 s4">
+                  {{gene_choice_button_text}}
+                </div>
+              </div>
+              <div id="geneMutationSection" style="display:none">
+                <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
+                  <button onclick="mainDropdown()" class="w3-btn w3-black my-btn" style="min-width: 100%">
+                    <p style="display:inline;">{{gene_choice_button_text}}:</p>
+                    <p style="display:inline;" id="geneDropdownButtonText"></p>
+                  </button>
+                  <div id="gene" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
+                </div>
+                <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col " id="mutation">
+                  <button class="w3-btn w3-black my-btn" id="mutationDropdownButton" style="min-width: 100%">
+                    <p style="display:inline;">{{mutation_choice_button_text}}</p>
+                    <p style="display:inline;" id="mutationDropdownButtonText"></p>
+                    <p style="display:inline;" id="mutationNameDropdownButtonText"></p>
+                  </button>
+                </div>
+                <div>
+                  <p class="w3-strong w3-margin text">
+                    {{example_text}}
+                    <a href="/embed?mutation=S:N501Y&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">S:N501Y</a>,
+                    <a href="/embed?mutation=N:A211V&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">N:A211V</a>
+                  </p>
+                </div>
+              </div>
+              <div id="lineageSection">
+                <div class="w3-container w3-padding w3-light-green w3-dropdown-click w3-col">
+                  <button onclick="lineageDropdown()" class="w3-btn w3-black my-btn" style="min-width: 100%">
+                    <p style="display:inline;">{{lineage_choice_button_text}}:</p>
+                    <p style="display:inline;" id="lineageDropdownButtonText"></p>
+                  </button>
+                  <div id="lineage" class="w3-dropdown-content w3-bar-block w3-border" style="max-height:250px; overflow:auto;"></div>
+                </div>
+                <div>
+                  <p class="w3-strong w3-margin text">
+                    {{example_text}}
+                    <a href="/embed?mutation=lineage:B.1.1.7&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Alpha (B.1.1.7)</a>,
+                    <a href="/embed?mutation=lineage:B.1.351&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Beta (B.1.351)</a>,
+                    <a href="/embed?mutation=lineage:B.1.617.2&lang={{lang}}&min_date={{min_date}}&max_date={{max_date}}">Delta (B.1.617.2)</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="w3-border w3-margin w3-btn w3-black my-btn w3-col" style="min-width: 90%" id="update">
+            <p>{{update_button_text}}</p>
+          </div>
+          <div class="w3-section w3-col certainMutationSection">
+            <div onclick="outbreakInfoLink('{{outbreak_info_link}}')" class="w3-margin w3-btn w3-col further_information w3-theme-d5 my-btn" id="updateDate">
+              <p style="display:inline;">{{further_information_text}} {{mutation}}  {{resourses_text}}</p>
+            </div>
+          </div>
+        </div>
+        <div class="w3-col l9">
+          <div class="certainMutationSection">
+            <div class="w3-margin-right w3-section">
+              <p class="plot_name">{{map_name_text}} {{mutation}}</p>
+              <div id="coronamapLoader" class="w3-white loader">
+                <span class="helper"></span>
+                <img src="/static/img/Taksa.gif" class="center">
+              </div>
+              <div id="coronamap"></div>
+            </div>
+          </div>
+          <div class="homeSection">
+            <div class="w3-margin-right w3-section">
+              <p class="plot_name">{{main_map_name_text}}</p>
+              <div id="maincoronamapLoader" class="w3-white loader">
+                <span class="helper"></span>
+                <img src="/static/img/Taksa.gif" class="center">
+              </div>
+              <div id="maincoronamap"></div>
+            </div>
+            <div class="w3-margin-right w3-section">
+              <p class="plot_name">{{plot_name_text}}</p>
+              <div id="coronaplotLoader" class="w3-white loader">
+                <span class="helper"></span>
+                <img src="/static/img/Taksa.gif" class="center">
+              </div>
+              <div id="coronaplot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="w3-container w3-padding-64 w3-center w3-opacity">
+    <div class="text w3-padding-32">
+      <p>{{definition_begining_text}} <a href="https://faculty.skoltech.ru/people/georgiibazykin">{{lab_name_text}}</a> {{definition_end_text}}</p>
+      <p><a href="">{{DK_name_text}}</a>, <a href="">{{EN_name_text}}</a>, <a href="https://twitter.com/garushyants">{{SG_name_text}}</a>, <a href="https://twitter.com/gbazykin">{{GB_name_text}}</a></p>
+      <p>{{questions_text}}</p>
+      <p>{{cite_text}}</p>
+   </div>
+   <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+  </footer>
+
+  <script>
+    var mutations = {{mutations_names}};
+    init(mutations);
+  </script>
+</body>
+{% endautoescape %}
+{% endblock %}
+
 </html>
