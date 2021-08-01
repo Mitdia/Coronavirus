@@ -115,6 +115,10 @@ ENV/
 env.bak/
 venv.bak/
 
+Dockerfile
+docker-compose.yml
+nginx.conf
+
 # Spyder project settings
 .spyderproject
 .spyproject
