@@ -12,6 +12,7 @@ from bokeh.models import (
     DatePicker,
     LinearAxis,
     Div,
+    Legend,
 )
 from bokeh.models.tools import HoverTool, PanTool, ResetTool, WheelZoomTool
 from bokeh.plotting import figure
@@ -146,7 +147,8 @@ def create_plot(db, lang, min_date, max_date, width):
     p.y_range.start = 0
     p.y_range = Range1d(0, 100)
     p.yaxis.axis_label = first_y_label
-    p.extra_y_ranges = {"number_of_samples": Range1d(start=0, end=600)}
+    height= max(samplelist) + 100
+    p.extra_y_ranges = {"number_of_samples": Range1d(start=0, end=height)}
     p.add_layout(
         LinearAxis(y_range_name="number_of_samples", axis_label=second_y_label),
         "right",
@@ -164,13 +166,18 @@ def create_plot(db, lang, min_date, max_date, width):
     p.axis.minor_tick_line_color = None
     p.outline_line_width = 0
     p.outline_line_color = None
-    p.legend.location = "top_left"
-    p.legend.orientation = "vertical"
     p.legend.background_fill_alpha = 0.1
     p.legend.items = p.legend.items[::-1]
-    if width <= 920:
+    if width <= 1400:
         p.xaxis.major_label_orientation = pi/3
-        p.legend.items = []
+    if width <= 500:
+        p.yaxis.axis_label = None
+        p.plot_height = PLT_HEIGHT * 2
+        p.legend.label_text_font_size = '10px'
+    else:
+        p.legend.label_text_font_size = '15px'
+    p.legend.orientation = "vertical"
+    p.add_layout(p.legend[0], "left")
     layout = column(p, sizing_mode="scale_width")
     print("finished --- %s seconds ---" % (time.time() - start_time))
     return layout
@@ -216,6 +223,10 @@ def create_map(db, mutation_name, lang, min_date, max_date):
     p = configure_plot()
     no_data_text = db.get_text(lang, "no_data_text", "plot_information")
     map_tooltip = db.get_text(lang, "map_tooltip", "plot_information")
+    nonmutated_legend_text = db.get_text(lang, "legend_nonmutated", "plot_information")
+    mutated_legend_text = db.get_text(lang, "legend_mutated", "plot_information")
+    mutated_renders = []
+    nonmutated_renders = []
     for region in db.regions(lang):
         coordinates_of_region = db.coordinate(region)
         all_variants = db.number_of_samples(region, min_date, max_date)
@@ -238,7 +249,7 @@ def create_map(db, mutation_name, lang, min_date, max_date):
         first_color = Colorblind[7][5]
         second_color = Colorblind[7][3]
         if nonmutated_variants == 0:
-            p.circle(
+            nmr = p.circle(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
                 radius=10,
@@ -246,8 +257,9 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 fill_color=first_color,
                 name=tooltip,
             )
+            nonmutated_renders.append(nmr)
         elif mutated_variants == 0:
-            p.circle(
+            mr = p.circle(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
                 radius=10,
@@ -255,10 +267,11 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 fill_color=second_color,
                 name=tooltip,
             )
+            mutated_renders.append(mr)
         else:
             first_angle = mutated_variants / all_variants * 2 * pi
             second_angle = nonmutated_variants / all_variants * 2 * pi
-            p.wedge(
+            nmr = p.wedge(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
                 radius=10,
@@ -269,7 +282,7 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 name=tooltip,
                 alpha=0.8,
             )
-            p.wedge(
+            mr = p.wedge(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
                 radius=10,
@@ -280,7 +293,13 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 name=tooltip,
                 alpha=0.8,
             )
-
+            nonmutated_renders.append(nmr)
+            mutated_renders.append(mr)
+    p.add_layout(Legend(items=[
+    (nonmutated_legend_text, nonmutated_renders),
+    (mutated_legend_text, mutated_renders),
+    ]))
+    p.legend.location = "top_left"
     layout = column(p, sizing_mode="scale_width")
     return layout
 
