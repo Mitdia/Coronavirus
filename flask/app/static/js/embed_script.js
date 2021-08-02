@@ -175,88 +175,164 @@ function home() {
   window.location.href=(`/embed?mutation=ALL&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
 }
 
+function certainMutations() {
+    window.location.href = (`/embed?mutation=lineage:B.1.617.2&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+}
+
+
+function closeAllDropdowns(except) {
+    if (except != "gene") {
+      var x = document.getElementById("gene");
+      if (x.className.indexOf("w3-show") != -1) {
+          x.className = x.className.replace(" w3-show", "");
+      }
+    }
+    if (except != "lineage") {
+      var x = document.getElementById("lineage");
+      if (x.className.indexOf("w3-show") != -1) {
+          x.className = x.className.replace(" w3-show", "");
+      }
+    }
+    for (var i = 0; i < genes_array.length; i++) {
+        var local_gene = genes_array[i];
+        var x = document.getElementById(local_gene + ":");
+        if ((x.className.indexOf("w3-show") != -1) || (except != local_gene)) {
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }
+}
+
 
 function geneDropdown(id) {
-  var x = document.getElementById(id + ":");
-  current_gene = id;
+    closeAllDropdowns(id);
+    var x = document.getElementById(id + ":");
+    current_gene = id;
 
-  var mutationDropdownButton =  document.getElementById("mutationDropdownButton");
-  var mutationDropdownButtonText =  document.getElementById("mutationDropdownButtonText");
-  var geneDropdownButtonText = document.getElementById("geneDropdownButtonText");
-  var mutationNameDropdownButtonText =  document.getElementById("mutationNameDropdownButtonText");
+    var mutationDropdownButton = document.getElementById("mutationDropdownButton");
+    var mutationDropdownButtonText = document.getElementById("mutationDropdownButtonText");
+    var geneDropdownButtonText = document.getElementById("geneDropdownButtonText");
+    var mutationNameDropdownButtonText = document.getElementById("mutationNameDropdownButtonText");
 
-  mutationDropdownButton.onclick = function () {geneDropdown(current_gene)};
-  mutationDropdownButtonText.textContent = current_gene + ':';
-  geneDropdownButtonText.textContent = current_gene;
-  mutationNameDropdownButtonText.textContent = '';
-
-  if (x.className.indexOf("w3-show") == -1) {
-    x.className += " w3-show";
-  } else {
-    x.className = x.className.replace(" w3-show", "");
-  }
-  var x = document.getElementById("gene");
-  if (x.className.indexOf("w3-show") != -1) {
-    x.className = x.className.replace(" w3-show", "");
-  }
-  for (var i = 0; i < genes_array.length; i++)
-  {
-    var x = document.getElementById(genes_array[i] + ":");
-    if ((x.className.indexOf("w3-show") != -1) && (genes_array[i] != id)) {
-      x.className = x.className.replace(" w3-show", "");
+    var mutation_array = id.split(':');
+    if (mutation_array[0] == "ALL") {
     }
-  }
+    else if (mutation_array[0] == "lineage") {
+    }
+    else {
+      geneDropdownButtonText.textContent = mutation_array[0];
+      mutationDropdownButtonText.textContent = mutation_array[0] + ':';
+      mutationNameDropdownButtonText.textContent = mutation_array[1];
+    }
+
+    mutationDropdownButton.onclick = function() {
+        geneDropdown(current_gene)
+    };
+    mutationDropdownButtonText.textContent = current_gene + ':';
+    geneDropdownButtonText.textContent = current_gene;
+    mutationNameDropdownButtonText.textContent = '';
+
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+    } else {
+        x.className = x.className.replace(" w3-show", "");
+    }
 }
 
 
 function mainDropdown() {
-  var x = document.getElementById("gene");
-  if (x.className.indexOf("w3-show") == -1) {
-    x.className += " w3-show";
-  } else {
-    x.className = x.className.replace(" w3-show", "");
-  }
-  for (var i = 0; i < genes_array.length; i++)
-  {
-    var x = document.getElementById(genes_array[i] + ":");
-    if (x.className.indexOf("w3-show") != -1) {
-      x.className = x.className.replace(" w3-show", "");
+    closeAllDropdowns("gene");
+    var x = document.getElementById("gene");
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+    } else {
+        x.className = x.className.replace(" w3-show", "");
     }
-  }
 }
 
 
-function changeupdate(new_mutation) {
-  var x = document.getElementById("gene");
-  if (x.className.indexOf("w3-show") != -1) {
-    x.className = x.className.replace(" w3-show", "");
-  }
-  for (var i = 0; i < genes_array.length; i++)
-  {
-    var x = document.getElementById(genes_array[i] + ":");
-    if (x.className.indexOf("w3-show") != -1) {
-      x.className = x.className.replace(" w3-show", "");
+function lineageDropdown() {
+    closeAllDropdowns("lineage");
+    var x = document.getElementById("lineage");
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+    } else {
+        x.className = x.className.replace(" w3-show", "");
     }
-  }
-  mutation = new_mutation;
-  var updateButton = document.getElementById("update");
-  var mutationNameDropdownButtonText =  document.getElementById("mutationNameDropdownButtonText");
-  updateButton.onclick = function () {window.location.href=(`/embed?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);}
-  mutationNameDropdownButtonText.textContent = mutation.split(':')[1];
+}
+
+
+function changeUpdate(new_mutation) {
+    closeAllDropdowns();
+    mutation = new_mutation;
+    var updateButton = document.getElementById("update");
+    var mutationNameDropdownButtonText = document.getElementById("mutationNameDropdownButtonText");
+    updateButton.onclick = function() {
+        window.location.href = (`/embed?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+    }
+    mutationNameDropdownButtonText.textContent = mutation.split(':')[1];
+}
+
+
+function changeUpdateLineage(new_lineage) {
+    closeAllDropdowns();
+    mutation = new_lineage;
+    var updateButton = document.getElementById("update");
+    var lineageDropdownButtonText = document.getElementById("lineageDropdownButtonText");
+    updateButton.onclick = function() {
+        window.location.href = (`/embed?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+    }
+    lineageDropdownButtonText.textContent = mutation.split(':')[1];
 }
 
 
 function dateRangeSlider(min_timestamp, max_timestamp) {
-  var update = document.getElementById("update");
-  min_date = new Date(min_timestamp);
-  min_date = min_date.getFullYear() + "-" + (min_date.getMonth() + 1) + "-" + min_date.getDate();
-  max_date = new Date(max_timestamp);
-  max_date = max_date.getFullYear() + "-" + (max_date.getMonth() + 1) + "-" + max_date.getDate();
-  update.onclick = function() {window.location.href=(`/embed?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);};
+    var update = document.getElementById("update");
+    min_date = new Date(min_timestamp);
+    min_date = min_date.getFullYear() + "-" + (min_date.getMonth() + 1) + "-" + min_date.getDate();
+    max_date = new Date(max_timestamp);
+    max_date = max_date.getFullYear() + "-" + (max_date.getMonth() + 1) + "-" + max_date.getDate();
+    update.onclick = function() {
+        window.location.href = (window.location.pathname + `?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+    };
+}
+
+
+function minDatePicker(new_min_date) {
+    var update = document.getElementById("update");
+    min_date = new_min_date.replace("-0", "");
+    update.onclick = function() {
+        window.location.href = (window.location.pathname + `?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+    };
+}
+
+
+function maxDatePicker(new_max_date) {
+    var update = document.getElementById("update");
+    max_date = new_max_date.replace("-0", "");
+    update.onclick = function() {
+        window.location.href = (window.location.pathname + `?mutation=${mutation}&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+    };
 }
 
 
 function outbreakInfoLink(outbreak_link) {
-  console.log(outbreakInfoLink);
-  window.location.href=(outbreak_link);
+    console.log(outbreakInfoLink);
+    window.location.href = (outbreak_link);
+}
+
+
+function switchToLineage() {
+  closeAllDropdowns();
+  if (current_choice_section == "lineageSection") {
+    var oldSection = document.getElementById("lineageSection");
+    var newSection = document.getElementById("geneMutationSection");
+    current_choice_section = "geneMutationSection";
+  }
+  else {
+    var oldSection = document.getElementById("geneMutationSection");
+    var newSection = document.getElementById("lineageSection");
+    current_choice_section = "lineageSection";
+  }
+  oldSection.style.display = "none";
+  newSection.style.display = "block";
 }
