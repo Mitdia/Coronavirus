@@ -4,6 +4,8 @@ from functools import lru_cache
 
 @lru_cache()
 def check_date_format(date_string):
+    if date_string == None:
+        return False
     format = "%Y-%m-%d"
     try:
         datetime.strptime(date_string, format)

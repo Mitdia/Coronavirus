@@ -78,7 +78,7 @@ def embed_map():
     mutation = request.args.get("mutation", type=str)
     language = request.args.get("lang", type=str)
     min_date = request.args.get("min_date", type=str)
-    max_date = request.args.get("max_date", type=str, default=today)
+    max_date = request.args.get("max_date", type=str)
     if not security_check(db, mutation, language, min_date, max_date):
         return redirect(
             f"/embed?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}"
