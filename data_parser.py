@@ -169,7 +169,7 @@ def get_lineage(mutations):
 
 
 def parse_data(regions, adress=Path("Data", "Data.csv")):
-    main_data = open(adress, "r", encoding="utf-8")
+    main_data = open(adress, "r", encoding="cp1252")
     data = pd.read_csv(main_data, sep="\t", header=None)
     dbase = sqlite3.connect(Path("flask", "samples_data.sqlite"))
 
@@ -210,7 +210,7 @@ def parse_data(regions, adress=Path("Data", "Data.csv")):
                 pandas_index += 1
 
     mutation_data.to_sql("data_about_mutations", dbase, if_exists="replace")
-    
+
     data.to_sql("samples_data", dbase, if_exists="replace")
     dbase.commit()
     dbase.close()
