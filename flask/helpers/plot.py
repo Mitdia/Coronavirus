@@ -249,7 +249,7 @@ def create_map(db, mutation_name, lang, min_date, max_date):
         first_color = Colorblind[7][5]
         second_color = Colorblind[7][3]
         if nonmutated_variants == 0:
-            nmr = p.circle(
+            mr = p.circle(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
                 radius=10,
@@ -257,9 +257,9 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 fill_color=first_color,
                 name=tooltip,
             )
-            nonmutated_renders.append(nmr)
+            mutated_renders.append(mr)
         elif mutated_variants == 0:
-            mr = p.circle(
+            nmr = p.circle(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
                 radius=10,
@@ -267,11 +267,11 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 fill_color=second_color,
                 name=tooltip,
             )
-            mutated_renders.append(mr)
+            nonmutated_renders.append(nmr)
         else:
             first_angle = mutated_variants / all_variants * 2 * pi
             second_angle = nonmutated_variants / all_variants * 2 * pi
-            nmr = p.wedge(
+            mr = p.wedge(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
                 radius=10,
@@ -282,7 +282,7 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 name=tooltip,
                 alpha=0.8,
             )
-            mr = p.wedge(
+            nmr = p.wedge(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
                 radius=10,
