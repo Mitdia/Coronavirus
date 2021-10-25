@@ -231,11 +231,13 @@ def create_map(db, mutation_name, lang, min_date, max_date):
         coordinates_of_region = db.coordinate(region)
         all_variants = db.number_of_samples(region, min_date, max_date)
         if all_variants == 0:
-            p.circle(
+            p.wedge(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
                 radius=10,
                 alpha=0.1,
+                start_angle=0,
+                end_angle=2*pi,
                 fill_color="blue",
                 name=f"{region}: {no_data_text}",
             )
@@ -249,21 +251,27 @@ def create_map(db, mutation_name, lang, min_date, max_date):
         first_color = Colorblind[7][5]
         second_color = Colorblind[7][3]
         if nonmutated_variants == 0:
-            mr = p.circle(
+            mr = p.wedge(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
                 radius=10,
                 alpha=0.8,
+                start_angle=0,
+                end_angle=2*pi,
+                line_color="white",
                 fill_color=first_color,
                 name=tooltip,
             )
             mutated_renders.append(mr)
         elif mutated_variants == 0:
-            nmr = p.circle(
+            nmr = p.wedge(
                 x=coordinates_of_region[0],
                 y=PLT_HEIGHT - coordinates_of_region[1],
                 radius=10,
                 alpha=0.8,
+                start_angle=0,
+                end_angle=2*pi,
+                line_color="white",
                 fill_color=second_color,
                 name=tooltip,
             )
