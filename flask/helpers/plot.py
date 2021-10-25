@@ -258,7 +258,7 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 alpha=0.8,
                 start_angle=0,
                 end_angle=2*pi,
-                line_color="white",
+                line_width=0,
                 fill_color=first_color,
                 name=tooltip,
             )
@@ -271,7 +271,7 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 alpha=0.8,
                 start_angle=0,
                 end_angle=2*pi,
-                line_color="white",
+                line_width=0,
                 fill_color=second_color,
                 name=tooltip,
             )
@@ -286,7 +286,7 @@ def create_map(db, mutation_name, lang, min_date, max_date):
                 start_angle=0,
                 fill_color=first_color,
                 end_angle=first_angle,
-                line_color="white",
+                line_width=0,
                 name=tooltip,
                 alpha=0.8,
             )
