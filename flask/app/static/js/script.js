@@ -174,7 +174,7 @@ function home() {
 
 
 function certainMutations() {
-    window.location.href = (`/?mutation=lineage:Delta&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
+    window.location.href = (`/?mutation=lineage:B.1.617.2&lang=${language}&min_date=${min_date}&max_date=${max_date}`);
 }
 
 
