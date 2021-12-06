@@ -249,12 +249,8 @@ def lineages_freq(lineages_names, regions):
         dbase.close()
 
 blocked = [
-    "г. Севастополь",
-    "Республика Крым",
     "Московская область",
     "Moskva",
-    "Crimea",
-    "Sevastopol'",
 ]
 
 genes = [

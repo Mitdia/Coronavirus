@@ -82,5 +82,7 @@ coordinates = {
     "Sakhalin": [1355, 575],
     "Yevrey": [1265, 690],
     "Chukotka": [1260, 150],
+    "Crimea": [35, 620],
+    "Sevastopol'": [20, 625],
 }
 regions = list(coordinates)
