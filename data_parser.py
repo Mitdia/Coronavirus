@@ -2,6 +2,7 @@ from pathlib import Path
 import sqlite3
 import pandas as pd
 from map_data import coordinates
+from tqdm import tqdm
 
 
 def number_of_mutated_variants(db, mutation, region):
@@ -190,25 +191,25 @@ def parse_data(regions, adress=Path("Data", "Data.csv")):
 
     pandas_index = 0
     previous_index = -1
-
-    for index, row in data.iterrows():
-        if index >= previous_index + 100:
-            print(index)
-            previous_index = index
+    mutation_records_array = []
+    for index, row in tqdm(data.iterrows()):
+        # if index >= previous_index + 100:
+        #     print(index)
+        #     previous_index = index
         location = row["Location_EN"]
         date = row["date"]
         for mutation in row["mutations"].split(","):
             if mutation != " ":
-
-                mutation_data.loc[pandas_index] = [
-                    mutation,
-                    translate_regions_names(location),
-                    location,
-                    date,
-                    index,
-                ]
+                mutation_records_array.append([
+                mutation,
+                translate_regions_names(location),
+                location,
+                date,
+                index,
+                ])
                 pandas_index += 1
 
+    mutation_data = pd.DataFrame(mutation_records_array, columns=mutation_data.columns)
     mutation_data.to_sql("data_about_mutations", dbase, if_exists="replace")
 
     data.to_sql("samples_data", dbase, if_exists="replace")
