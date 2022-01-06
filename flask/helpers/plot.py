@@ -97,6 +97,8 @@ def create_plot(db, lang, min_date, max_date, width):
     first_y_label = db.get_text(lang, "first_y_label", "plot_information")
     second_y_label = db.get_text(lang, "second_y_label", "plot_information")
     other = db.get_text(lang, "other_text", "plot_information")
+    min_date = datetime.strptime(min_date, '%Y-%m-%d').strftime("%Y-%m")
+    max_date = datetime.strptime(max_date, '%Y-%m-%d').strftime("%Y-%m")
     datelist = pd.date_range(min_date, max_date, freq="MS").strftime("%Y-%m").tolist()
     samplelist = [db.number_of_samples_by_month(date) for date in datelist]
     data = {"dates": datelist}
