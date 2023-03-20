@@ -20,6 +20,7 @@ from helpers.template import get_template_variables
 from jinja2 import Environment, PackageLoader, Template
 from loguru import logger
 from settings import SERVER_ADDRESS, SERVER_PORT
+from dateutil.relativedelta import relativedelta
 
 db = Database(app)
 
@@ -74,7 +75,9 @@ def date_range_slider():
 
 @app.route("/embed")
 def embed_map():
-    today = datetime.today().strftime("%Y-%m-%d")
+    today = datetime.today()
+    three_months_ago = (today + relativedelta(months=-3)).strftime("%Y-%m-%d")
+    today = today.strftime("%Y-%m-%d")
     mutation = request.args.get("mutation", type=str)
     language = request.args.get("lang", type=str)
     min_date = request.args.get("min_date", type=str)
@@ -103,7 +106,9 @@ def embed_map():
 
 @app.route("/home")
 def home():
-    today = datetime.today().strftime("%Y-%m-%d")
+    today = datetime.today()
+    three_months_ago = (today + relativedelta(months=-3)).strftime("%Y-%m-%d")
+    today = today.strftime("%Y-%m-%d")
     mutation = request.args.get("mutation", type=str)
     language = request.args.get("lang", type=str)
     min_date = request.args.get("min_date", type=str)
@@ -134,7 +139,9 @@ def home():
 
 @app.route("/")
 def root():
-    today = datetime.today().strftime("%Y-%m-%d")
+    today = datetime.today()
+    three_months_ago = (today + relativedelta(months=-3)).strftime("%Y-%m-%d")
+    today = today.strftime("%Y-%m-%d")
     mutation = request.args.get("mutation", type=str)
     language = request.args.get("lang", type=str)
     min_date = request.args.get("min_date", type=str)
