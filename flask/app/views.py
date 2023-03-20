@@ -84,7 +84,7 @@ def embed_map():
     max_date = request.args.get("max_date", type=str)
     if not security_check(db, mutation, language, min_date, max_date):
         return redirect(
-            f"/embed?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}"
+            f"/embed?mutation=ALL&lang=RU&min_date={three_months_ago}&max_date={today}"
         )
     template_variables = get_template_variables(db, mutation, language, min_date, max_date)
     return file_html(
@@ -115,7 +115,7 @@ def home():
     max_date = request.args.get("max_date", type=str)
     if not security_check(db, mutation, language, min_date, max_date):
         return redirect(
-            f"/home?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}"
+            f"/home?mutation=ALL&lang=RU&min_date={three_months_ago}&max_date={today}"
         )
     template_variables = get_template_variables(
         db, mutation, language, min_date, max_date
@@ -148,7 +148,7 @@ def root():
     max_date = request.args.get("max_date", type=str)
     if not security_check(db, mutation, language, min_date, max_date):
         return redirect(
-            f"/home?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}"
+            f"/home?mutation=ALL&lang=RU&min_date={three_months_ago}&max_date={today}"
         )
     template_variables = get_template_variables(
         db, mutation, language, min_date, max_date
