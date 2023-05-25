@@ -13,7 +13,11 @@ from bokeh.models import (
     LinearAxis,
     Div,
     Legend,
+    ColumnDataSource,
+    DataTable,
+    TableColumn,
 )
+from random import randint
 from bokeh.models.tools import HoverTool, PanTool, ResetTool, WheelZoomTool
 from bokeh.plotting import figure
 from bokeh.palettes import Category20, Colorblind
@@ -59,8 +63,8 @@ def configure_plot():
     """
     tools = [zoom, reset, hover, pan]
     p = figure(
-        plot_width=PLT_WIDTH,
-        plot_height=PLT_HEIGHT,
+        width=PLT_WIDTH,
+        height=PLT_HEIGHT,
         tooltips=TOOLTIPS,
         tools=tools,
         toolbar_location=None,
@@ -131,9 +135,11 @@ def create_plot(db, lang, min_date, max_date, width):
     lineages.append(other)
     colors = Category20[16]
     print("data formated --- %s seconds ---" % (time.time() - start_time))
+
+
     p = figure(
-        plot_width=PLT_WIDTH,
-        plot_height=PLT_HEIGHT,
+        width=PLT_WIDTH,
+        height=PLT_HEIGHT,
         x_range=data["dates"],
         tools=[],
         toolbar_location=None,
@@ -188,8 +194,8 @@ def create_plot(db, lang, min_date, max_date, width):
 def create_main_map(db, lang, min_date, max_date, mode="main"):
     p = configure_plot()
     most_prevaling_lineages_names = get_most_spread_variants(db, min_date, max_date, 5)
+    other = db.get_text(lang, "other_text", "plot_information")
     for region in db.regions(lang):
-        other = db.get_text(lang, "other_text", "plot_information")
         coordinates_of_region = db.coordinate(region)
         number_of_samples = db.number_of_samples(region, min_date, max_date)
         most_prevaling_lineages = {}
@@ -313,6 +319,52 @@ def create_map(db, mutation_name, lang, min_date, max_date):
     layout = column(p, sizing_mode="scale_width")
     return layout
 
+
+def create_main_table(db, lang, min_date, max_date, mode="main"):
+    # most_prevaling_lineages_names = get_most_spread_variants(db, min_date, max_date, 5)
+    # other = db.get_text(lang, "other_text", "plot_information")
+    data = {"region": [], "number_of_samples": []}
+    for region in db.regions(lang):
+        number_of_samples = db.number_of_samples(region, min_date, max_date)
+        data["region"].append(region)
+        data["number_of_samples"].append(number_of_samples)
+        # most_prevaling_lineages = {}
+        # for lineage in most_prevaling_lineages_names:
+        #     line = "lineage:" + lineage
+        #     number = db.number_of_mutated_variants(line, region, min_date, max_date)
+        #     most_prevaling_lineages[lineage] = number
+    source = ColumnDataSource(data)
+    columns = [
+        TableColumn(field="region", title="Regions"),
+        TableColumn(field="number_of_samples", title="Number of samples"),
+    ]
+    data_table = DataTable(source=source, columns=columns)
+    layout = column(data_table, sizing_mode="scale_width")
+    return data_table
+
+
+def create_table(db, mutation_name, lang, min_date, max_date):
+    data = {"region": [], "frequency": [], "mutated": [], "nonmutated": []}
+    for region in db.regions(lang):
+        data["region"].append(region)
+        all_variants = db.number_of_samples(region, min_date, max_date)
+        mutated_variants = db.number_of_mutated_variants(mutation_name, region, min_date, max_date)
+        nonmutated_variants = all_variants - mutated_variants
+        freq = (mutated_variants / all_variants) if all_variants != 0 else 0
+        data["frequency"].append(freq)
+        data["mutated"].append(mutated_variants)
+        data["nonmutated"].append(nonmutated_variants)
+
+    source = ColumnDataSource(data)
+    columns = [
+        TableColumn(field="region", title="Regions"),
+        TableColumn(field="frequency", title="Frequency"),
+        TableColumn(field="frequency", title="Number of mutated sequences"),
+        TableColumn(field="frequency", title="Number of nonmutated sequences"),
+    ]
+    data_table = DataTable(source=source, columns=columns)
+    layout = column(data_table, sizing_mode="scale_width")
+    return data_table
 
 def create_date_range_slider(mutation_name, lang, min_date, max_date):
     mind = [int(i) for i in min_date.split("-")]

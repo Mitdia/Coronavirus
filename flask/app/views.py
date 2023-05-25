@@ -5,7 +5,7 @@ from pathlib import Path
 from datetime import date, datetime
 from bokeh.embed import file_html, json_item
 from bokeh.plotting import figure
-from bokeh.models import DateRangeSlider
+from bokeh.models import DateRangeSlider, DataTable
 from bokeh.resources import CDN
 from database import Database
 from flask import Flask, request, Markup, send_from_directory, redirect
@@ -13,6 +13,8 @@ from helpers.plot import (
     create_plot,
     create_main_map,
     create_map,
+    create_main_table,
+    create_table,
     create_date_range_slider,
 )
 from helpers.security import security_check
@@ -41,9 +43,9 @@ def map():
     if not security_check(db, mutation, language, min_date, max_date):
         return flask.render_template("error.html")
     if mutation == "ALL":
-        p = create_main_map(db, language, min_date, max_date)
+        p = create_main_table(db, language, min_date, max_date)
     elif mutation in db.mutations_names:
-        p = create_map(db, mutation, language, min_date, max_date)
+        p = create_table(db, mutation, language, min_date, max_date)
     return json_item(p, "coronamap")
 
 
@@ -129,6 +131,7 @@ def home():
                 start=date(2015, 1, 1),
                 end=date(2017, 12, 31),
             ),
+            DataTable(),
         ],  # TODO: remove me CDN only
         CDN,
         "taxameter.ru",
@@ -162,6 +165,7 @@ def root():
                 start=date(2015, 1, 1),
                 end=date(2017, 12, 31),
             ),
+            DataTable(),
         ],  # TODO: remove me CDN only
         CDN,
         "taxameter.ru",
