@@ -1,13 +1,9 @@
 import sqlite3
+import time
+from datetime import datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 
-from datetime import datetime, timedelta
-import pandas as pd
-from flask import _app_ctx_stack, current_app
-from loguru import logger
-from rich import print
-import time
 
 def last_day_of_month(any_day):
     next_month = any_day.replace(day=28) + timedelta(days=4)
@@ -27,14 +23,14 @@ class Database(object):
 
     @lru_cache()
     def regions(self, language="EN"):
-        start_time = time.time()
+        # start_time = time.time()
         db = sqlite3.connect(Path("samples_data.sqlite"))
         result = db.execute(f"SELECT {language}_names FROM regions").fetchall()
         regions_names = []
         for region in result:
             regions_names.append(region[0])
         db.close()
-        #print("db.regions --- %s seconds ---" % (time.time() - start_time))
+        # print("db.regions --- %s seconds ---" % (time.time() - start_time))
         return regions_names
 
     @lru_cache()
@@ -114,7 +110,7 @@ class Database(object):
     def number_of_mutated_variants(
         self, mutation, region="ALL", first_date="default", last_date="default"
     ):
-        start_time = time.time()
+        # start_time = time.time()
         db = sqlite3.connect(Path("samples_data.sqlite"))
         if first_date == "default":
             first_date = self.min_date
@@ -164,12 +160,12 @@ class Database(object):
                 )
         result = int(list(result)[0][0])
         db.close()
-        #print("db.number_of_mutated_variants --- %s seconds ---" % (time.time() - start_time))
+        # print("db.number_of_mutated_variants --- %s seconds ---" % (time.time() - start_time))
         return result
 
     @lru_cache()
     def number_of_mutated_variants_by_month(self, mutation, date="ALL"):
-        start_time = time.time()
+        # start_time = time.time()
         if date == "ALL":
             db = sqlite3.connect(Path("samples_data.sqlite"))
             result = db.execute(
@@ -188,7 +184,7 @@ class Database(object):
             result = self.number_of_mutated_variants(
                 mutation, "ALL", first_date, last_date
             )
-        #print("db.number_of_mutated_variants_by_month --- %s seconds ---" % (time.time() - start_time))
+        # print("db.number_of_mutated_variants_by_month --- %s seconds ---" % (time.time() - start_time))
         return result
 
     @property
@@ -226,7 +222,7 @@ class Database(object):
 
     @lru_cache()
     def get_text(self, lang, text_name, table_name="information_text"):
-        start_time = time.time()
+        # start_time = time.time()
         db = sqlite3.connect(Path("samples_data.sqlite"))
         result = db.execute(
             f"""SELECT text_body_{lang} FROM {table_name}
@@ -235,7 +231,7 @@ class Database(object):
         ).fetchall()
         db.close()
         result = list(result)[0][0]
-        #print("db.text --- %s seconds ---" % (time.time() - start_time))
+        # print("db.text --- %s seconds ---" % (time.time() - start_time))
         return result
 
     @lru_cache()
@@ -257,20 +253,6 @@ class Database(object):
                     most_prevaling_lineages[lineage_name] = lineage_freq
             db.close()
         return most_prevaling_lineages
-
-
-
-    def add_mutation_info(self, mutation, info, lang):
-        db = sqlite3.connect(Path("samples_data.sqlite"))
-        db.execute(
-            f"""UPDATE mutations
-                    SET {lang}_info = {info}
-                    WHERE mutation_name = {mutation};
-            """
-        )
-        db.commit()
-        db.close()
-        return
 
     def add_mutation_info(self, mutation, info, lang):
         db = sqlite3.connect(Path("samples_data.sqlite"))

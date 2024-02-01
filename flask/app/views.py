@@ -1,3 +1,4 @@
+import flask
 from app import app
 import sys
 from functools import lru_cache
@@ -8,7 +9,7 @@ from bokeh.plotting import figure
 from bokeh.models import DateRangeSlider, DataTable
 from bokeh.resources import CDN
 from database import Database
-from flask import Flask, request, Markup, send_from_directory, redirect
+from flask import request, redirect
 from helpers.plot import (
     create_plot,
     create_main_map,

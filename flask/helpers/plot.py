@@ -97,7 +97,7 @@ def configure_plot():
 
 
 def create_plot(db, lang, min_date, max_date, width):
-    start_time = time.time()
+    # start_time = time.time()
     first_y_label = db.get_text(lang, "first_y_label", "plot_information")
     second_y_label = db.get_text(lang, "second_y_label", "plot_information")
     other = db.get_text(lang, "other_text", "plot_information")
