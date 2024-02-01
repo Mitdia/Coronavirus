@@ -90,7 +90,7 @@ class Database(object):
 
     @lru_cache()
     def number_of_samples_by_month(self, date="ALL"):
-        start_time = time.time()
+        # start_time = time.time()
         if date == "ALL":
             db = sqlite3.connect(Path("samples_data.sqlite"))
             result = db.execute(f"SELECT COUNT(*) FROM samples_data")

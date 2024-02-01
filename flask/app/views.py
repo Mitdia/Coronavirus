@@ -6,7 +6,7 @@ from pathlib import Path
 from datetime import date, datetime
 from bokeh.embed import file_html, json_item
 from bokeh.plotting import figure
-from bokeh.models import DateRangeSlider
+from bokeh.models import DateRangeSlider, DataTable
 from bokeh.resources import CDN
 from database import Database
 from flask import request, redirect
@@ -14,6 +14,8 @@ from helpers.plot import (
     create_plot,
     create_main_map,
     create_map,
+    create_main_table,
+    create_table,
     create_date_range_slider,
 )
 from helpers.security import security_check
@@ -21,6 +23,7 @@ from helpers.template import get_template_variables
 from jinja2 import Environment, PackageLoader, Template
 from loguru import logger
 from settings import SERVER_ADDRESS, SERVER_PORT
+from dateutil.relativedelta import relativedelta
 
 db = Database(app)
 
@@ -41,9 +44,9 @@ def map():
     if not security_check(db, mutation, language, min_date, max_date):
         return flask.render_template("error.html")
     if mutation == "ALL":
-        p = create_main_map(db, language, min_date, max_date)
+        p = create_main_table(db, language, min_date, max_date)
     elif mutation in db.mutations_names:
-        p = create_map(db, mutation, language, min_date, max_date)
+        p = create_table(db, mutation, language, min_date, max_date)
     return json_item(p, "coronamap")
 
 
@@ -75,14 +78,16 @@ def date_range_slider():
 
 @app.route("/embed")
 def embed_map():
-    today = datetime.today().strftime("%Y-%m-%d")
+    today = datetime.today()
+    three_months_ago = (today + relativedelta(months=-3)).strftime("%Y-%m-%d")
+    today = today.strftime("%Y-%m-%d")
     mutation = request.args.get("mutation", type=str)
     language = request.args.get("lang", type=str)
     min_date = request.args.get("min_date", type=str)
     max_date = request.args.get("max_date", type=str)
     if not security_check(db, mutation, language, min_date, max_date):
         return redirect(
-            f"/embed?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}"
+            f"/embed?mutation=ALL&lang=RU&min_date={three_months_ago}&max_date={today}"
         )
     template_variables = get_template_variables(db, mutation, language, min_date, max_date)
     return file_html(
@@ -104,14 +109,16 @@ def embed_map():
 
 @app.route("/home")
 def home():
-    today = datetime.today().strftime("%Y-%m-%d")
+    today = datetime.today()
+    three_months_ago = (today + relativedelta(months=-3)).strftime("%Y-%m-%d")
+    today = today.strftime("%Y-%m-%d")
     mutation = request.args.get("mutation", type=str)
     language = request.args.get("lang", type=str)
     min_date = request.args.get("min_date", type=str)
     max_date = request.args.get("max_date", type=str)
     if not security_check(db, mutation, language, min_date, max_date):
         return redirect(
-            f"/home?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}"
+            f"/home?mutation=ALL&lang=RU&min_date={three_months_ago}&max_date={today}"
         )
     template_variables = get_template_variables(
         db, mutation, language, min_date, max_date
@@ -125,6 +132,7 @@ def home():
                 start=date(2015, 1, 1),
                 end=date(2017, 12, 31),
             ),
+            DataTable(),
         ],  # TODO: remove me CDN only
         CDN,
         "taxameter.ru",
@@ -135,14 +143,16 @@ def home():
 
 @app.route("/")
 def root():
-    today = datetime.today().strftime("%Y-%m-%d")
+    today = datetime.today()
+    three_months_ago = (today + relativedelta(months=-3)).strftime("%Y-%m-%d")
+    today = today.strftime("%Y-%m-%d")
     mutation = request.args.get("mutation", type=str)
     language = request.args.get("lang", type=str)
     min_date = request.args.get("min_date", type=str)
     max_date = request.args.get("max_date", type=str)
     if not security_check(db, mutation, language, min_date, max_date):
         return redirect(
-            f"/home?mutation=ALL&lang=RU&min_date=2020-2-9&max_date={today}"
+            f"/home?mutation=ALL&lang=RU&min_date={three_months_ago}&max_date={today}"
         )
     template_variables = get_template_variables(
         db, mutation, language, min_date, max_date
@@ -156,6 +166,7 @@ def root():
                 start=date(2015, 1, 1),
                 end=date(2017, 12, 31),
             ),
+            DataTable(),
         ],  # TODO: remove me CDN only
         CDN,
         "taxameter.ru",

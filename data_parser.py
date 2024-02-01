@@ -62,7 +62,11 @@ def get_mutations_names(data, dbase):
                 else:
                     break
             mutation_name[3] = mutation_name[1][count:]
-            mutation_name[2] = mutation_name[1][0]
+            try:
+                mutation_name[2] = mutation_name[1][0]
+            except IndexError:
+                print(mutation_name)
+
             mutation_name[1] = number
 
             if mutation_name not in mutations_names and mutation_name != "":
