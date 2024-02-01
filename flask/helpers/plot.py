@@ -110,7 +110,7 @@ def create_plot(db, lang, min_date, max_date, width):
     if len(lineages) == 0:
         no_data_div = Div(text="No data", width=PLT_WIDTH, height=PLT_HEIGHT)
         return no_data_div
-    print("most spread variants recieved --- %s seconds ---" % (time.time() - start_time))
+    # print("most spread variants recieved --- %s seconds ---" % (time.time() - start_time))
     length = len(datelist)
     for lineage in lineages:
         data[lineage] = [0 for i in range(length)]
@@ -134,7 +134,7 @@ def create_plot(db, lang, min_date, max_date, width):
         data[other][i] = other_freq
     lineages.append(other)
     colors = Category20[16]
-    print("data formated --- %s seconds ---" % (time.time() - start_time))
+    # print("data formated --- %s seconds ---" % (time.time() - start_time))
 
 
     p = figure(
@@ -187,7 +187,7 @@ def create_plot(db, lang, min_date, max_date, width):
     p.legend.orientation = "vertical"
     p.add_layout(p.legend[0], "left")
     layout = column(p, sizing_mode="scale_width")
-    print("finished --- %s seconds ---" % (time.time() - start_time))
+    # print("finished --- %s seconds ---" % (time.time() - start_time))
     return layout
 
 
